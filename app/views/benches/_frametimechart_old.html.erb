@@ -1,0 +1,122 @@
+<script type="text/javascript">
+var addPointIntervalFrametime
+<% benches_game_id = BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id %>
+function startFrametime(){
+  $.getJSON( "/benches_games/" + id + "/full_frametime", function( data ) {
+    var json
+    var count = 0;
+    json = data
+    $.each(frametimechart.data.datasets, function(i, val){
+      json[i].data.sort(function(a, b) {
+          return a[0] - b[0];
+      });  
+    })
+    frametimechart.options.scales.xAxes[0].ticks.min = 25
+    frametimechart.options.scales.xAxes[0].ticks.max = 25
+    function addPoint(){
+      frametimechart.data.labels[count] = count
+      $.each(frametimechart.data.datasets, function(i, val){
+        frametimechart.data.datasets[i].data[count] = parseFloat(json[i].data[count][1])  
+      })
+      if ((json[0].data.length - 1) == count){
+        clearInterval(addPointIntervalFrametime)
+        frametimechart.options.scales.xAxes[0].ticks.min = 0
+        frametimechart.options.scales.xAxes[0].ticks.max = count
+      }
+      if (count > 10){
+        if (json[0].data.length == count){
+          frametimechart.options.scales.xAxes[0].ticks.min = count / 2
+          frametimechart.options.scales.xAxes[0].ticks.max = count
+        } else {
+          frametimechart.options.scales.xAxes[0].ticks.min = count - 10
+          frametimechart.options.scales.xAxes[0].ticks.max = count - 1
+        }
+      }
+      frametimechart.update()
+      count += 1
+    }
+    addPointIntervalFrametime = setInterval(function(){ addPoint(); }, 100);
+  })
+}
+var frametimechart = new Chart(document.getElementById("frametimechart"), {
+  type: 'line',
+  gridLines: {
+    display: false ,
+    color: "#FFFFFF"
+  },
+  data: {
+    labels: [],
+    datasets: [
+      <% require 'open-uri' %>
+      <% json = JSON.load(open("http://localhost:3000/benches_games/" + benches_game_id.to_s + "/full_fps")) %>
+      <% json.each do |series| %>
+        {
+          // lineTension: 0,
+          data: [],
+          label: "<%= series['name'] %>",
+          borderColor: '<%= series['color'] %>',
+          backgroundColor: '<%= series['color'] %>',
+          fill: false,
+          lineTension: 0,
+          borderWidth: 1,
+        },
+      <% end %>
+    ],
+    borderWidth: 3
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Frame time',
+      lineHeight: 3,
+      position: 'top',
+      padding: -10
+    },
+    tooltips: {
+      enabled: false
+    },
+    elements: {
+    point:{
+        radius: 0
+      },
+    },
+    scales: {
+      xAxes: [{
+        ticks: {
+          display: false
+        },
+        gridLines: {
+          color: 'white',
+          lineWidth: 0
+        }
+      }],
+      yAxes: [{
+        position: 'right',
+        ticks: {
+          reverse: false,
+          stepSize: 5,
+          min: <%= (BenchesGame.find(benches_game_id).inputs.minimum(:frametime) * 0.75).round(-1) + 1  %> ,
+          max: <%= (BenchesGame.find(benches_game_id).inputs.maximum(:frametime) * 1).round(-1) - 10%>,
+        },
+        gridLines: {
+          color: 'white',
+          lineWidth: 1
+        }
+      },{
+        position: 'left',
+        ticks: {
+          display: false,
+          stepSize: 5,
+          min: <%= (BenchesGame.find(benches_game_id).inputs.minimum(:frametime) * 0.75).round(-1) + 1%>,
+          max: <%= (BenchesGame.find(benches_game_id).inputs.maximum(:frametime) * 1).round(-1) - 10%>,
+        },
+        gridLines: {
+          color: 'white',
+          lineWidth: 1
+        }
+      }
+      ]
+  },
+  }
+})
+</script>

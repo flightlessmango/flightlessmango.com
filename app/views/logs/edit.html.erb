@@ -1,0 +1,62 @@
+<% if @log.user != current_user || !current_user.admin %>
+  <% raise :error %>
+<% else %>
+  <%= render 'upload' %>
+  <br>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Color</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @log.uploads.sort_by(&:"#{:id}").each do |upload| %>
+      <tr>
+        <td class="" style="width: 10%;">
+          <div class="row">
+            <div class="col-6">
+              <div class="colorPickSelector" id="colorPick_<%= upload.blob.id %>"></div>
+            </div>
+            <div class="col-4">
+              <i class="fas fa-arrow-down" style="margin-top: 50%;"></i>
+            </div>
+          </div>
+        </td>
+        <td><input class="form-control text-center" id="<%= "blob_" + upload.blob.id.to_s + "_filename"%>" value="<%= upload.blob.filename %>"> </td>
+        <script type="text/javascript">
+          var timeoutBlob_<%= upload.blob.id.to_s %>
+          function updateFilename_<%= upload.blob.id.to_s %>(){
+            $.get( "<%= update_blob_filename_game_log_path(@game) %>" + "?blob_id=" + <%= upload.blob_id.to_s %> + "&filename=" +  $('#blob_<%= upload.blob.id.to_s %>_filename').val(), function( data ) {
+            });
+          }
+
+            var first = true;
+            $("#colorPick_<%= upload.blob.id %>").colorPick({
+              'initialColor' : '<%= upload.color %>',
+              'palette': <%= raw Bench::TWENTY %>,
+              'onColorSelected': function() {
+                if (!first) {
+                $.get( "<%= update_attachment_color_game_log_path(@game, @log) %>" + "?attachment_id=" + <%= upload.id.to_s %> + "&color=" + this.color.replace('#', ''), function( data ) {
+                });
+                }
+                this.element.css({'backgroundColor': this.color, 'color': this.color});
+              }
+            });
+            
+            $("#blob_<%= upload.blob.id %>_filename").on('input', function() {
+                window.clearTimeout(timeoutBlob_<%= upload.blob.id.to_s %>)
+                timeoutBlob_<%= upload.blob.id.to_s %> = window.setTimeout(function() {
+                  updateFilename_<%= upload.blob.id.to_s %>()
+                }, 500);
+              });
+
+        </script>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+<script type="text/javascript">
+first = false;
+</script>

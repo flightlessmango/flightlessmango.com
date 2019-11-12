@@ -1,0 +1,36 @@
+<h3>User Benchmarks</h3>
+<%= search_form_for @q do |f| %>
+<div class="row">
+  <div class="col-6 col-sm-4 col-lg-3">
+    <%= f.label :name %>
+    <%= f.search_field :name_cont, placeholder: "Search Game", class: 'form-control' %>
+  </div>
+    <div class="col-6 col-sm-4 col-lg-3">
+      <div class="funkyradio">
+          <div class="funkyradio-mango">
+              <%= f.check_box :logs_game_id_not_null %>
+              <label for="q_logs_game_id_not_null">Has Benchmarks</label>
+          </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+      <%= f.submit "Search", class: "btn btn-mango"%>
+  </div>
+</div>
+<br>
+<% end %>
+<div class="row">
+  <div class="col-12">
+    <div id="games_table">
+      <%= render partial: 'games/table', locals: {games: @games} %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  <!-- $(document).on('turbolinks:load', () => $('#game_search input').keyup(function() {
+    $.get($('#game_search').attr('action'), $('#game_search').serialize(), null, 'script');
+  })); -->
+</script>

@@ -1,0 +1,16 @@
+<table class="table table-bordered">
+  <thead>
+    <th>Name</th>
+    <th>Benchmarks</th>
+  </thead>
+  <tbody>
+    <% @games.each do |game| %>
+      <% if game.benches.any? %>
+        <tr>
+            <td><%= link_to game.name, game %></td>
+            <td><%= game.benches.count %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>

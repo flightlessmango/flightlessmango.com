@@ -1,0 +1,23 @@
+
+<% if user_signed_in? && current_user.admin?  %>
+   <%#= link_to "Edit", edit_bench_path(@benchmark), class: 'btn btn-warning' %>
+<% end %>
+<% unless @benchmark.description.blank? %>
+  <%= render 'modal_description' %>
+  <button type="button" class="btn btn-mango" data-toggle="modal" data-target="#descriptionModal">
+    Benchmark Description
+  </button>
+<% end %>
+  
+<a class="btn btn-lg btn-primary float-right" href="https://www.youtube.com/watch?v=<%= @benchmark.youtubeid %>" role="button" style="background-color: #cc0000;" id="youtubeButton"><strong>Youtube</strong></a>
+<br><br>
+<h2 style="text-align: center;"><%= @benchmark.name %></h2>
+<h6 style="text-align: center;">Data without recording</h6>
+<br>
+<% unless @benchmark.inputs.empty? %>
+  <% if @benchmark.apis.count > 1 %>
+    <%= render 'graphs_apis' %>
+  <% else %>
+    <%= render 'graphs' %>
+  <% end %>
+<% end %>

@@ -1,0 +1,30 @@
+<% @benchmark.games.each do |game| %>
+<h3><%= game.name %></h3>
+<% if game.inputs.any? %>
+  <table class="table table-bordered">
+    <thead>
+      <th>Color</th>
+      <th>Type</th>
+      <th>Min</th>
+      <th>Max</th>
+      <th>Avg</th>
+      <th>Total</th>
+      <th>Tools</th>
+    </thead>
+    <tbody>
+      <!-- fix this query, it's way too expensive -->
+      <%# game.types.joins(:inputs).where('inputs.bench_id = ?', @benchmark.id).each do |type| %>
+      <tr>
+        <td style="background-color: <%#= type.inputs.where(bench_id: @benchmark.id).first.color %>;"></td>
+        <td><%#= type.name %></td>
+        <td><%#= type.inputs.where(bench_id: @benchmark.id).minimum(:fps).to_i %></td>
+        <td><%#= type.inputs.where(bench_id: @benchmark.id).maximum(:fps).to_i %></td>
+        <td><%#= type.inputs.where(bench_id: @benchmark.id).average(:fps).to_i %></td>
+        <td><%#= type.inputs.where(bench_id: @benchmark.id).count %></td>
+        <td><%#= link_to 'Destroy All', delete_inputs_bench_path(@benchmark, :type => type.id, :benches_game_id => BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).last.id), class: 'btn btn-danger', remote: true %></td>
+      </tr>
+      <%# end %>
+    </tbody>
+  </table>
+  <% end %>
+<% end %>

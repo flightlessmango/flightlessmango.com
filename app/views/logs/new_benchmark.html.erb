@@ -1,0 +1,39 @@
+<h3>Create new Benchmark</h3>
+<%= form_for @log, :html => {:class => "form-horizontal center"}, remote: false do |f| %>
+  <%= f.hidden_field :user_id, value: current_user.id %>
+    <div class="row">
+      <!-- <div class="col-4">
+      Log files
+      <%#= f.file_field :uploads, multiple: true, direct_upload: false, class: 'form-control-file' %>
+    </div> -->
+    <!-- <div class="col-3">
+     Log comparison
+        <%#= f.select :compare_to, options_from_collection_for_select(@log.uploads.blobs.order(:id), "id", "filename", @log.compare_to), {}, { class: 'form-control chosen-container chosen-container-single chosen-select'} %>
+      </div> -->
+      <!-- <div class="col-1"></div> -->
+      <div class="col-3">
+       Game
+       <% if params[:game_id] %>
+          <%= f.select :game_id, options_from_collection_for_select(Game.all.order(name: :asc), "id", "name", Game.find(params[:game_id]).id), {}, { class: 'form-control chosen-container chosen-container-single chosen-select'} %>  
+       <% else %>
+          <%= f.select :game_id, options_from_collection_for_select(Game.all.order(name: :asc), "id", "name"), {}, { class: 'form-control chosen-container chosen-container-single chosen-select'} %>
+       <% end %>
+        </div>
+    </div>
+      <br>
+    <div class="row">
+      <div class="col-6">
+        <%= f.submit "Submit", id: 'submit', class: 'btn btn-primary' %>
+        <%#= link_to "View Benchmark", games_user_benchmark_show_path(@log), class: 'btn btn-success' %><br>
+      </div>
+    </div>
+  <%#= select_tag "type_id", options_from_collection_for_select(Type.all, "id", "name") %>
+<% end %>
+
+<script type="text/javascript">
+  $(function() {
+    $('.chosen-select').chosen()
+    $('#log_game_id_chosen').css("color", "black");
+    $('#log_compare_to_chosen').css("color", "black");
+  })
+</script>

@@ -1,0 +1,28 @@
+<%= form_for @benchmark do |f| %>
+<div class="row">
+  <div class="col-sm-4">
+    <div class="form-group">
+      <%= f.label :name, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :name, :class => 'form-control' %>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="form-group">
+      <%= f.label :youtubeid, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :youtubeid, :class => 'form-control' %>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-2">
+    <div class="form-group">
+      <%= f.label 'Actions', :class => 'control-label' %>
+      <div class="controls">
+        <%= f.submit nil, id: 'commentable.model_name.name.downcase + "_" +  + commentable.id.to_s + "_comment_submit"', :class => 'btn btn-primary' %>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

@@ -1,0 +1,101 @@
+<style media="screen">
+  body{
+    background-color: black;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    padding-top: 197px;
+    padding-left: 5px;
+  }
+</style>
+<!-- <button id="hide" onclick="hide()">Hide</button>  -->
+<!-- <br>
+<div class="row">
+  <div class="col-2">
+    <div class="progress">
+      <div id="dx11" class="progress-bar bg-success text-center" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">D3D11</div>
+    </div>
+  </div>  
+</div>
+<p></p> -->
+<!-- <div class="row">
+  <div class="col-2">
+    <div class="progress">
+      <div id="dx12" class="progress-bar bg-danger text-center" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">D3D12</div>
+    </div>
+  </div>  
+</div> -->
+
+<% if @benchmark.games.count > 1 %>
+<nav>
+  <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
+    <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
+        <a class="nav-item nav-link <% if i == 0 %> active <% end %>" id="nav-game-tab-<%= game.id %>" data-toggle="tab" href="#nav-game-<%= game.id %>" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
+    <% end %>
+  </div>
+</nav>
+<div class="tab-content" id="pills-tabContent">
+  <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
+      <div class="tab-pane fade show <% if i == 0 %> active <% end %>" id="nav-game-<%= game.id %>" role="tabpanel" aria-labelledby="nav-game-tab-<%= game.id %>">
+        <h3 class="text-center"><%= game.name %></h3>
+      </div>
+  <% end %>
+</div>
+<% end %>
+<!-- <div id="time">asdf</div> -->
+
+<div class="row">
+  <div class="col-8">
+    <div class="row">
+    <div class="col-1">
+        <h1 style="font-size: 10px;" class="my-1">FPS</h1>
+      </div>  
+    </div>
+    <canvas id="fpschart" height="25vh" width="80vw"></canvas>
+  </div>
+  <div class="col-4">
+      <div class="row">
+        <div class="col-7"></div><div class="col-1">
+        <h1 style="font-size: 10px;" class="my-1">Frametime</h1>
+      </div>
+    </div>
+    <canvas id="frametimechart" height="54vh" width="80vw"></canvas>
+  </div>
+</div>
+<%= render 'fpschart' %>
+<%= render 'frametimechart' %>
+<%#= render 'test_streaming' %>
+<script type="text/javascript">
+var id = <%= BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id %>
+
+$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+  <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
+      if(this.id == "nav-game-tab-<%= game.id %>"){
+        id = <%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id %>
+        clearInterval(addPointInterval)
+        clearInterval(addPointIntervalFrametime)
+      }
+    <% end %>
+})
+
+// setTimeout(function(){
+//   startFrametime();
+//   startFps();  
+// }, 3000); 
+// 
+
+setTimeout(function(){
+  fpschart.options.scales.yAxes[0].ticks.max = 110
+  fpschart.options.scales.yAxes[1].ticks.max = 110
+  fpschart.options.scales.yAxes[0].ticks.min = 50
+  fpschart.options.scales.yAxes[1].ticks.min = 50
+  fpschart.options.scales.yAxes[0].ticks.stepSize = 10
+  fpschart.options.scales.yAxes[1].ticks.stepSize = 10
+  console.log('first')
+}, 100);
+
+
+function hide(){
+  $('#nav-tab, #pills-tabContent, #hide').hide()
+
+}
+</script>

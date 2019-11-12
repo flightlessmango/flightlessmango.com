@@ -1,0 +1,22 @@
+<table class="table table-bordered">
+  <thead>
+    <th>Online</th>
+    <th>#User</th>
+    <th>Username</th>
+    <th>Url</th>
+  </thead>
+  <tbody>
+    <% @users.order(:id).each do |user| %>
+      <tr>
+        <% if user.online? %>
+          <td style="background-color: green;"></td>
+        <% else %>
+          <td style="background-color: red;"></td>
+        <% end %>
+        <td><%= user.id %></td>
+        <td><%= user.username %></td>
+        <td class="col-6"><%= user.url %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

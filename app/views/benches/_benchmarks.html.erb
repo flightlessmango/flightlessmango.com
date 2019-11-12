@@ -1,0 +1,17 @@
+  <div class="row">
+    <% benchmarks.order(created_at: :desc).each do |bench| %>
+    <div class="col-12 col-sm-6 col-md-6 col-lg-6 col-xl-4 my-3 ">
+      <%= link_to bench do %>
+        <%= image_tag "https://img.youtube.com/vi/#{bench.youtubeid}/maxresdefault.jpg", class: 'img-fluid' %>
+      <% end %>
+      <br>
+      <h6 class="text-center"><%= bench.name %></h6>
+      <p></p>
+      <div class="text-center">
+        <%# Type.where(id: bench.inputs.pluck(:type_id).uniq).each do |type| %>
+        <!--  <span class="badge badge-primary" style="background-color: black; color: <%#= type.inputs.first.color %>;"><%#= type.name %></span> -->
+        <%# end %>
+      </div>
+    </div>
+    <% end %>
+  </div>

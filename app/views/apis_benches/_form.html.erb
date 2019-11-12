@@ -1,0 +1,19 @@
+<%= form_for @benches_api, remote: false do |f| %>
+  <%= f.hidden_field :bench_id, value: @benchmark.id %>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="form-group">
+        <div class="controls">
+          <%= f.collection_select :api_id, Api.all.where.not(id: @benchmark.apis.pluck(:id)), :id, :name, {} %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+        <div class="controls">
+          <%= f.submit 'Add Api' %>
+        </div>
+      </div>
+  </div>
+<% end %>

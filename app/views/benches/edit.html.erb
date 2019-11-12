@@ -1,0 +1,43 @@
+<h3>Edit Benchmark</h3>
+<%= render 'form' %>
+<%= render 'upload' %><br>
+
+<div class="progress" style="height: 20px;">
+  <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+<p></p>
+<div class="row">
+  <div class="col-6">
+    <div class="card mb-3">
+      <div class="card-header">Games</div>
+        <div class="card-body">
+          <%= render 'games_table' %>
+          <%= render 'benches_games/form' %>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card mb-3">
+        <div class="card-header">Versions</div>
+        <div class="card-body">
+          <%= render 'variations/table' %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <div class="card mb-3">
+        <div class="card-header">APIs</div>
+          <div class="card-body">
+            <%= render 'apis_table' %>
+            <%= render 'apis_benches/form' %>
+          </div>
+        </div>
+      </div>
+  </div>
+<div id="input_table">
+  <%= render 'input_table' %>
+</div>
+
+<%= render 'layouts/toastr' %>

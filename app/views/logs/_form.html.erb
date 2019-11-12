@@ -1,0 +1,26 @@
+<%= form_for [@game, @log] do |f| %>
+<%= hidden_field_tag :attachment, value: true %>
+<%= f.hidden_field :game_id, value: @game.id %>
+<%= f.hidden_field :user_id, value: current_user.id %>
+
+<div class="row">
+  <div class="col-3">
+    Title
+    <%= f.text_field :title, class: 'form-control' %>
+  </div>
+  <div class="col-1"></div>
+  <div class="col-4">
+    Desciption
+    <%= f.text_area :text, class: 'form-control' %>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="col-4">
+    <%= f.file_field :uploads, :class => '', multiple: true %>
+  </div>
+  <div class="col-4">
+    <%= f.submit "Upload", class: 'btn btn-success' %>
+  </div>
+</div>
+<% end %>

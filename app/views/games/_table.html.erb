@@ -1,0 +1,32 @@
+<%= will_paginate(games, :renderer => WillPaginate::ActionView::Bootstrap4LinkRenderer,
+ :previous_label => 'Back', :next_label => 'Next', inner_window: 0, outer_window: 0,
+  class: 'd-flex') %>
+<div class="row" id="gamesList">
+<% games.order(name: :asc).each do |game| %>
+  <div class="col-6 col-sm-3 my-2">
+    <div class="card">
+      <% if game.steamid.nil? %>
+        <%= link_to image_tag("https://lutris.net" + game.image_url, class: 'card-img-top'), game_path(game) %>
+      <% else %>
+        <%= link_to image_tag("https://steamcdn-a.akamaihd.net/steam/apps/" + game.steamid.to_s + "/header.jpg", class: 'card-img-top'), game_path(game) %>
+      <% end %>
+      <div class="card-body">
+        <p class="card-text">
+          <%= link_to game.name, game %><br>
+          <% if game.steamid.nil? %>
+          <br>
+          <% end %>
+        </p>
+      </div>
+    </div>
+  </div>
+  <br>
+ <% end %> 
+</div>
+
+<script type="text/javascript">
+//  $('#gamesList').hide();
+//  document.addEventListener("turbolinks:load", function() {
+//    $('#gamesList').fadeIn();
+//});
+</script>

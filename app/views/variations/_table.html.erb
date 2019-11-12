@@ -1,0 +1,25 @@
+<div class="row">
+  <div class="col-sm-6">
+    <table class="table table-bordered">
+      <thead>
+        <th>Version</th>
+        <th>Type</th>
+        <th>Action</th>
+      </thead>
+      <tbody>
+        <% Variation.all.each do |variation| %>
+        <tr>
+          <td><%= variation.name %></td>
+          <td><%= variation.type.name %></td>
+          <td>        <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      variation_path(variation),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-sm btn-danger', remote: false %>
+          </td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<table class="table table-bordered" id="stats-table">
+ <thead class="thead-dark">
+    <tr>
+        <th>Name</th>
+        <th class="d-none d-sm-block">Min</th>
+        <th>1% Min</th>
+        <th>Avg</th>
+        <th class="d-none d-sm-block">Max</th>
+        <% if @types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').any? %>
+          <th>Avg % vs Windows DX12</th>
+        <% end %>
+        <% if @types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').empty? %>
+          <th>Avg % vs Windows DX12</th>
+        <% end %>
+        <% if @types.where(name: 'Windows DX11').any?  && @types.where(name: 'Windows DX12').empty? %>
+          <th>Avg % vs Windows DX11</th>
+        <% end %>
+        <% if @types.where(name: 'stock-CFS').any? %>
+          <th>Avg % vs stock-CFS</th>
+        <% end %>
+        <% if @types.where(name: 'CFS').any? %>
+          <th>Avg % vs CFS</th>
+        <% end %>
+    </tr>
+ </thead>
+     <tbody style="color: white;">
+       <% types.order(name: :desc).each do |type| %>
+       <% typeInputs = type.inputs.where(benches_game_id: benches_game_id) %>
+       <% pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id) %>
+       <% onepercent = typeInputs.where(id: pluck).average(:fps) %>
+        <tr>
+          <td><%= type %></td>
+          <td class="d-none d-sm-block"><%= typeInputs.minimum(:fps).to_i %></td>
+          <td><%= onepercent.to_i %></td>
+          <td><%= typeInputs.average(:fps).to_i %></td>
+          <td class="d-none d-sm-block"><%= typeInputs.maximum(:fps).to_i %></td>
+          <td>
+            <% if @types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').any? %>
+              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows DX12').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+            <% end %>
+            <% if @types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').empty? %>
+              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows DX12').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+            <% end %>
+            <% if @types.where(name: 'Windows DX11').any?  && @types.where(name: 'Windows DX12').empty? %>
+              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows DX11').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+            <% end %>
+            <% if @types.where(name: 'stock-CFS').any? %>
+              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'stock-CFS').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+            <% end %>
+            <% if @types.where(name: 'CFS').any? %>
+              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'CFS').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+            <% end %>
+          </td>
+        </tr>
+       <% end %>
+     </tbody>

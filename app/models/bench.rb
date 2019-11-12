@@ -1,0 +1,337 @@
+class Bench < ApplicationRecord
+  extend FriendlyId
+  friendly_id :youtubeid, use: :slugged
+
+  has_and_belongs_to_many :games, through: :inputs
+  has_and_belongs_to_many :apis, through: :inputs
+  has_many :inputs
+  has_many :types, -> { distinct }, through: :inputs
+  has_many :variations, -> { distinct }, through: :inputs
+  has_one_attached :upload
+  
+  COLORS    =  ["#3398dc", "#6639b6", "#e64b3b", "#72c02c", "#ebc71d", "#ed4a82", "#b09980", "#22e3be", "#fe541e", "#00BB27", "#4000FF"]
+  COLORSRGB =  ["rgba(51,152,220,1)", "rgba(102,57,182,1)", "rgba(230,75,59,1)", "rgba(114,192,44,1)", "rgba(235,199,29,1)"]
+  TWENTY    =  [ '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8',
+     '#800000', '#aaffc3', '#808000', '#000075', '#808080' ]
+  FILETYPES = ["MANGO", "HML"]
+  
+  def self.refresh
+    Bench.all.each do |bench|
+      bench.refresh_json
+    end
+  end
+  
+  def parse_upload(game_id, variation_id, type_id, bench_id, color, api_id)
+    require 'csv'
+    parsed = CSV.parse(upload.attachment.download)
+    length = parsed.count
+      parsed.each_with_index do |parse, i|
+        Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(bench_id: self.id, game_id: game_id).last.id,
+                      type_id: type_id, fps: parse[1], frametime: (1000 / parse[1].to_f).round(2),
+                      cpu: parse[2].to_f, gpu: parse[2].to_i, color: color, pos: i, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+        ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 100 == 0
+    end
+    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
+    self.refresh_json
+    self.refresh_json_api
+    ActionCable.server.broadcast 'web_notifications_channel', 100
+  end
+  
+  def parse_upload_hml(game_id, variation_id, type_id, bench_id, color, api_id)
+    require 'csv'
+    parsed = CSV.parse(upload.attachment.download)
+    length = parsed.count
+    count = 0
+    fps = 0
+    gpu = 0
+    cpu = 0
+    parsed.each_with_index do |parse, i|
+      if parsed[0][i] == "Framerate           "
+        fps = i
+      end
+      if parsed[0][i] == "GPU1 usage          "
+        gpu = i
+      end
+      if parsed[0][i] == "CPU usage           "
+        cpu = i
+      end
+    end
+      parsed.each_with_index do |parse, i|
+        unless parse[69] == nil || i == 0
+          #5.times do 
+            Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
+                          type_id: type_id, fps: parse[76].to_d, frametime: (1000 / parse[76].to_f).round(2),
+                          cpu: parse[cpu].to_f, gpu: parse[gpu].to_i, color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+            count += 1
+          #end
+        end
+        ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
+    end
+    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
+    self.refresh_json
+    self.refresh_json_api
+    ActionCable.server.broadcast 'web_notifications_channel', 100
+  end
+  
+  def parse_upload_mango(game_id, variation_id, type_id, bench_id, color, api_id)
+    require 'csv'
+    parsed = CSV.parse(upload.attachment.download)
+    count = 0
+    length = parsed.count
+      parsed.each_with_index do |parse, i|
+        # Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
+        #               type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2),
+        #               cpu: parse[1].to_f, gpu: plarse[2].to_i, color: color, pos: count)
+        # REMOVED CPU/GPU FOR MESA OVERLAY
+        if i > 1
+          Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
+                        type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2), cpu: parse[1], gpu: parse[2],
+                        color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+                        count += 1          
+          end
+        ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
+    end
+    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
+    self.refresh_json
+    self.refresh_json_api
+    ActionCable.server.broadcast 'web_notifications_channel', 100
+  end
+  
+  def bar
+    benches_game = BenchesGame.last
+    min = {}
+    avg = {}
+    max = {}
+    onepercent = {}
+    benches_game.types.each do |type|
+      typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
+      min.store(type.name, typeInputs.minimum(:fps).to_f)
+    end
+    benches_game.types.each do |type|
+      compare = 0
+      min.each do |test|
+        if test.first == type.name
+          compare = test.second.to_f
+        end
+      end
+      typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
+      pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id)
+      onepercent.store(type.name, (typeInputs.where(id: pluck).average(:fps) - compare).to_f)
+    end
+    benches_game.types.each do |type|
+      compare = 0
+      min.each do |x|
+        if x.first == type.name
+          onepercent.each do |y|
+            if x.first == type.name
+              compare = x.second.to_f + y.second.to_f
+            end 
+          end
+        end
+      end
+      typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
+      avg.store(type.name, (typeInputs.average(:fps) - compare).to_f)
+    end
+    benches_game.types.each do |type|
+      compare = 0
+      min.each do |x|
+        if x.first == type.name
+          onepercent.each do |y|
+            if x.first == type.name
+              avg.each do |z|
+                if z.first == type.name
+                  compare = x.second.to_f + y.second.to_f + z.second.to_f
+                end
+              end
+            end 
+          end
+        end
+      end
+      typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
+      max.store(type.name, (typeInputs.maximum(:fps) - compare).to_f)
+    end
+    bar_chart = [
+            {
+              name: 'Max',
+              data: max
+            },
+            {
+              name: 'Average',
+              data: avg
+            },
+            {
+              name: '1% Min',
+              data: onepercent
+            },
+            # {
+            #   name: '1% Min',
+            #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.1).pluck(:id)).joins(:type).group('types.name').average(:fps),
+            # },
+            # {
+            #   name: '0.1% Min',
+            #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.01).pluck(:id)).joins(:type).group('types.name').average(:fps),
+            # },
+            {
+              name: 'Min',
+              data: min,
+            }
+          ]
+     benches_game.update(bar: bar_chart)
+  end
+  
+  def refresh_json
+    Input.where(fps: 0).delete_all
+    onepercent = {}
+    self.games.each do |game|
+      benches_game = BenchesGame.where(game_id: game.id, bench_id: self.id).last
+      fps_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 2 == 0 }.compact.pluck(:id)).group(:pos).average(:fps), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 2 == 0 }.compact.pluck(:id)).group(:pos).average(:frametime), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      full_fps_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:fps), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      full_frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:frametime), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      gpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:gpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      cpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:cpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      onepercent = {}
+      benches_game.types.each do |type|
+        typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
+        pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id)
+        onepercent.store(type.name, typeInputs.where(id: pluck).average(:fps))
+      end
+      bar_chart = [
+              {
+                name: 'Min',
+                data: benches_game.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').minimum(:fps),
+              },
+              {
+                name: '1% Min',
+                data: onepercent
+              },
+              {
+                name: 'Avg',
+                data: benches_game.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').average(:fps),
+              },
+              {
+                name: 'Max',
+                data: benches_game.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').maximum(:fps),
+              },
+
+
+              # {
+              #   name: '1% Min',
+              #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.1).pluck(:id)).joins(:type).group('types.name').average(:fps),
+              # },
+              # {
+              #   name: '0.1% Min',
+              #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.01).pluck(:id)).joins(:type).group('types.name').average(:fps),
+              # },
+
+            ]
+      benches_game.update(fps: fps_chart, frametime: frametime_chart, full_fps: full_fps_chart, full_frametime: full_frametime_chart, bar: bar_chart, gpu: gpu_chart, cpu: cpu_chart)
+    end
+    if self.games.count > 0
+      totalbar_chart = [
+              # {
+              #   name: 'Max',
+              #   data: self.inputs.where(bench_id: self.id).joins(:type).order('types.name').group('types.name').maximum(:fps),
+              # },
+              {
+                name: 'Avg',
+                data: self.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').average(:fps)
+              },
+              # {
+              #   name: '1% Min',
+              #   data: onepercent
+              # },
+              # {
+              #   name: '1% Min',
+              #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.1).pluck(:id)).joins(:type).group('types.name').average(:fps),
+              # },
+              # {
+              #   name: '0.1% Min',
+              #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.01).pluck(:id)).joins(:type).group('types.name').average(:fps),
+              # },
+              # {
+              #   name: 'Min',
+              #   data: self.inputs.where(bench_id: self.id).joins(:type).order('types.name').group('types.name').minimum(:fps),
+              # }
+            ]
+            self.update(totalbar: totalbar_chart)
+      end
+  end
+  
+  def refresh_json_api
+    Input.where(fps: 0).delete_all
+    if self.apis.count > 1
+    self.apis.each do |api|
+      apis_bench = ApisBench.where(api_id: api.id, bench_id: self.id).last
+      fps_chart = apis_bench.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 2 == 0 }.compact.pluck(:id)).group(:pos).average(:fps), color: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).last.color}}.chart_json
+      frametime_chart = apis_bench.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 2 == 0 }.compact.pluck(:id)).group(:pos).average(:frametime), color: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).last.color}}.chart_json
+      full_fps_chart = apis_bench.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).group(:pos).average(:fps), color: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).last.color}}.chart_json
+      full_frametime_chart = apis_bench.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).group(:pos).average(:frametime), color: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).last.color}}.chart_json
+      onepercent = {}
+      apis_bench.types.each do |type|
+        typeInputs = type.inputs.where(bench_id: self.id)
+        pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id)
+        onepercent.store(type.name, typeInputs.where(id: pluck).average(:fps))
+      end
+      bar_chart = [
+              {
+                name: 'Min',
+                data: apis_bench.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').minimum(:fps),
+              },
+              {
+                name: '1% Min',
+                data: onepercent
+              },
+              {
+                name: 'Avg',
+                data: apis_bench.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').average(:fps),
+              },
+              {
+                name: 'Max',
+                data: apis_bench.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').maximum(:fps),
+              },
+            ]
+      apis_bench.update(fps: fps_chart, frametime: frametime_chart, full_fps: full_fps_chart, full_frametime: full_frametime_chart, bar: bar_chart)
+    end
+    if self.games.count > 1
+      apis_bench = ApisBench.where(api_id: api.id, bench_id: self.id).last
+      totalbar_chart = [
+              # {
+              #   name: 'Max',
+              #   data: self.inputs.where(bench_id: self.id).joins(:type).order('types.name').group('types.name').maximum(:fps),
+              # },
+              {
+                name: 'Avg',
+                data: self.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').average(:fps)
+              },
+              # {
+              #   name: '1% Min',
+              #   data: onepercent
+              # },
+              # {
+              #   name: '1% Min',
+              #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(Input.count * 0.1).pluck(:id)).joins(:type).group('types.name').average(:fps),
+              # },
+              # {
+              #   name: '0.1% Min',
+              #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(Input.count * 0.01).pluck(:id)).joins(:type).group('types.name').average(:fps),
+              # },
+              # {
+              #   name: 'Min',
+              #   data: self.inputs.where(bench_id: self.id).joins(:type).group('types.name').minimum(:fps),
+              # }
+            ]
+            self.update(totalbar: totalbar_chart)
+      end
+    end
+  end
+  
+  def get_desc
+    require 'open-uri'
+    url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + self.youtubeid + "&key=" + ENV["YOUTUBE_KEY"]
+    data = JSON.load(open(url))
+    self.update(description: data["items"][0]["snippet"]["description"])
+  end
+  
+end
+

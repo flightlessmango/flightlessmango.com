@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FlightlessMango</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%#= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= render 'layouts/google_analytics' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= favicon_link_tag asset_path('favicon.png') %>
+    <%= action_cable_meta_tag %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+
+  <body>
+    <%= render 'layouts/header' unless params[:action] == "recording" || params[:action] == "video_line" || params[:action] == "video_bar" %>
+    <% if params[:action] == "recording" %>
+      <div class="container-fluid">
+    <% else %>
+      <div class="container">
+    <% end %>
+      <%= yield %>
+    </div>
+  </body>
+</html>
+
+<% if user_signed_in? %>
+  <% ActionCable.server.broadcast 'user_channel_' + User.first.id.to_s, update: current_user.id %>
+  <% current_user.update(url: request.path) %>
+<% end %>

@@ -1,0 +1,25 @@
+<style media="screen">
+  body{
+    padding-top: 100px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+  }
+</style>
+<h1 class="text-center"><%= @benchmark.name %></h1>
+<h3 class="text-center"><%= @benchmark.inputs.last.game.name %></h3>
+<%= line_chart benches_game_fps_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
+   points: false, curve: false, download: false, title: 'FPS', id: 'fps', xtitle: "Time", ytitle: "FPS",
+   library: {yAxis: {min: @benchmark.inputs.minimum(:fps)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}}, height: '400px' %>
+<%= line_chart benches_game_full_frametime_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
+   points: false, curve: false, download: false, title: 'Frame Time', id: 'frametime', xtitle: "Time", ytitle: "Ms",
+    library: {yAxis: {min: @benchmark.inputs.minimum(:frametime)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px'  %>
+     <button id="hide" onclick="hide()">Hide</button> 
+    
+<script type="text/javascript">
+  function hide(){
+    $('.highcharts-button-symbol').hide()
+    $('.highcharts-button-box').hide()
+    $('#hide').hide()
+    $('.navbar').hide()
+  }
+</script>

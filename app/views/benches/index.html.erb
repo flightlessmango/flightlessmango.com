@@ -1,0 +1,4 @@
+<% if user_signed_in? && current_user.admin? %>
+  <%= link_to 'New Benchmark', new_bench_path, class: 'btn btn-primary' %>
+<% end %>
+<%= render partial: 'benchmarks', locals: {benchmarks: @benchmarks} %>

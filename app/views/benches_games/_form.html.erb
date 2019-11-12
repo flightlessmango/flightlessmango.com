@@ -1,0 +1,19 @@
+<%= form_for @benches_game, remote: false do |f| %>
+  <%= f.hidden_field :bench_id, value: @benchmark.id %>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="form-group">
+        <div class="controls">
+          <%= f.collection_select :game_id, Game.all.where(source: 'mango').where.not(id: @benchmark.games.pluck(:id)), :id, :name, {} %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+        <div class="controls">
+          <%= f.submit 'Add game' %>
+        </div>
+      </div>
+  </div>
+<% end %>

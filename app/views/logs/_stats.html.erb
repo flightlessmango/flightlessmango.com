@@ -1,0 +1,36 @@
+<table class="table table-bordered" id="stats-table">
+ <thead class="thead-dark">
+    <tr>
+        <th>Name</th>
+        <th>Min</th>
+        <th>1% Min</th>
+        <th>Max</th>
+        <th>Avg</th>
+        <% if @log.uploads.blobs.where(id: @log.compare_to).any? %>
+          <th>Avg % vs <%= @log.uploads.blobs.where(id: @log.compare_to).first.filename %></th>
+        <% else %>
+          <th>Avg % vs <%= @log.uploads.blobs.first.filename %></th>
+        <% end %>
+    </tr>
+ </thead>
+     <tbody style="color: white;">
+       <% @log.uploads.order(:id).each do |upload| %>
+        <tr>
+            <td><%= upload.blob.filename %></td>
+            <td><%= upload.min.to_i %></td>
+            <td><%= upload.onepercent.to_i %></td>
+            <td><%= upload.max.to_i %></td>
+            <td><%= upload.avg.to_i %></td>
+            <td>
+              <% if @log.uploads.blobs.where(id: @log.compare_to).any? %>
+                <%= (upload.avg / @log.uploads.blobs.where(id: @log.compare_to).first.attachments.first.avg * 100).round(2)%>
+              <% else %>
+                <%= (upload.avg / @log.uploads.first.avg * 100).round(2)%>
+              <% end %>
+                <%#= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows DX12').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+
+            </td>
+        </tr>
+        <% end %>
+     </tbody>
+</table>

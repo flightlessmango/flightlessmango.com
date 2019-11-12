@@ -1,0 +1,39 @@
+<% if @log.user == current_user %>
+  <%= link_to "Edit", edit_game_log_path(@game, @log), class: 'btn btn-warning' %>
+<% end %>
+<div class="container">
+  <div class="row">
+    <div class="col-3 mx-auto" style="padding-right: 5px; padding-top: 0px;">
+        <a href="<%= user_path(@log.user) %>"><img src="<%= @log.user.image %>" align="right" class="rounded" height="100px"></a>
+      <br><br><br><br><br>
+      <p class="text-right">
+        <strong><%=link_to @log.user.username, @log.user %></strong><br>
+        Benchmarks: <a class="badge badge-pill badge-mango" href="<%= user_path(@log.user) %>"><%= @log.user.logs.count %></a>
+      </p>
+    </div>
+    <div class="col-6">
+      <h3 style="text-align: center;"><%= @game.name %></h3>
+      <div class="row">
+        <div class="col-12">
+          <h4 style="text-align: center;"><%= @log.title %></h4>
+          <p style="text-align: center;">
+            <%= @log.text %>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-3 text-left mx-auto" style="padding: 0px; padding-left: 5px;">
+      <% if @log.computer.present? %>
+        <p>
+          <strong class="text-muted">Distro: </strong><small><%= @log.computer.os %></small> <br>
+          <strong class="text-muted">Kernel: </strong><small><%= @log.computer.kernel %></small><br>
+          <strong class="text-muted">GPU Driver: </strong><small><%= @log.computer.driver %></small><br>
+          <strong class="text-muted">GPU: </strong><small><%= @log.computer.gpu %></small><br>
+          <strong class="text-muted">CPU: </strong><small><%= @log.computer.cpu %></small><br>
+          <strong class="text-muted">RAM: </strong><small><%= @log.computer.ram.to_i / 1000000 %> GB</small><br>
+        </p>
+      <% end %>
+    </div>
+</div>
+  <%= render 'graphs' %>
+</div>

@@ -1,0 +1,57 @@
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <%= image_tag('FlightlessSmallNav.png', width: '40') %>
+      FlightlessMango
+    </a>
+      
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarColor02">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Benchmarks <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/games">Games <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/games/user_benchmarks">User Benchmarks <span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+             MangoHud
+           </a>
+           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+             <a class="dropdown-item disabled" href="https://github.com/flightlessmango/dxvk/">DXVK</a>
+             <a class="dropdown-item" href="https://github.com/flightlessmango/dxvk/">Github</a>
+             <div class="dropdown-divider"></div>
+             <a class="dropdown-item disabled" href="https://github.com/flightlessmango/mesa/tree/mango/src/vulkan/overlay-layer">Mesa</a>
+             <a class="dropdown-item" href="https://github.com/flightlessmango/mesa/tree/mango/src/vulkan/overlay-layer">Github</a>
+             <a class="dropdown-item" href="https://github.com/flightlessmango/PKGBUILDS/blob/master/vulkan-mesa-layer-mango/PKGBUILD">PKGBUILD</a>
+           </div>
+         </li>
+        
+        <% if user_signed_in? %>
+        <li class="nav-item dropdown">
+           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+             <%= current_user.username.capitalize %>
+           </a>
+           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+             <% if current_user.admin? %>
+             <%= link_to('Dashboard', dashboard_users_path, class: 'dropdown-item') %>
+             <% end %>
+             <%= link_to('Logout', destroy_user_session_path, method: :delete, class: 'dropdown-item') %>
+         </div>
+         </li>
+        <% else %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</nav>
+<br>

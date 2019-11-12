@@ -1,0 +1,16 @@
+<table class="table table-bordered">
+  <thead>
+    <th>Date</th>
+    <th>User</th>
+  </thead>
+  <tbody>
+    <% @benchmarks.all.each do |benchmark| %>
+      <% if benchmark.uploads.any? %>
+        <tr>
+          <td><%= link_to benchmark.created_at.strftime('%Y-%m-%d'), games_user_benchmark_show_path(log_id: benchmark.id, game_id: benchmark.game.id) %></td>
+          <td><%= benchmark.user.username %></td>
+        </tr>
+        <% end %>
+      <% end %>
+  </tbody>
+</table>

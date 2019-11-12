@@ -1,0 +1,7 @@
+<% if current_user.admin? %>
+<div id="dashboard_table">
+  <%= render 'table' %>
+</div>
+<% else %>
+  <%= raise :error %>
+<% end %>

@@ -1,0 +1,7 @@
+<h2 style="text-align: center;"><%= @game.name %></h2>
+<%= link_to "New Benchmark", new_game_log_path(@game, Log.new), class: 'btn btn-mango' %>
+<% if @game.source == 'mango' %>
+  <%= render partial: 'benches/benchmarks', locals: {benchmarks: @benchmarks} %>
+<% else %>
+  <%= render partial: 'logs/table', locals: {logs: @game.logs} %>
+<% end %>

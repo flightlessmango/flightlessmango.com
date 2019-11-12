@@ -1,0 +1,9 @@
+<h2 align="center"><%= @user.username %></h2>
+<% @user.logs.joins(:game).group('games.name').order('games.name').count.each do |game, count| %>
+<% game = Game.where(name: game).first %>
+<fieldset class="">
+   <legend class="w-auto" align="center" ><%= game.name %></legend>
+  <%= render partial: 'logs/table', locals: {logs: game.logs.where(user: @user) } %>
+</fieldset>
+  <br>
+<% end %>

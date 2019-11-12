@@ -1,0 +1,17 @@
+<table class='table table-bordered'>
+  <thead>
+    <tr>
+      <th>name</th>
+      <th>youtube</th>
+    </tr>
+  </thead>
+    <tbody>
+      <% @benchmarks.each do |benchmark| %>
+      <tr>
+        <td><%= image_tag "https://img.youtube.com/vi/#{benchmark.youtubeid}/maxresdefault.jpg", style: 'height: 150px;' %></td>
+        <td><%= link_to benchmark.name, benchmark %></td>
+        <td><%= benchmark.youtubeid %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>

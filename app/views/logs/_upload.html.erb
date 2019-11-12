@@ -1,0 +1,46 @@
+<%= form_for [@game, @log], :html => {:class => "form-horizontal center"}, remote: false do |f| %>
+  <%#= f.hidden_field :game_id, value: @game.id %>
+    <div class="row">
+      <div class="col-4">
+      Log files
+      <%= f.file_field :uploads, multiple: true, direct_upload: false, class: 'form-control-file' %>
+    </div>
+    <div class="col-3">
+      <% if @log.uploads.count > 1 %>
+     Log comparison
+        <%= f.select :compare_to, options_from_collection_for_select(@log.uploads.blobs.sort_by(&:"#{:id}"), "id", "filename", @log.compare_to), {}, { class: 'form-control chosen-container chosen-container-single chosen-select'} %>
+      <% end %>
+      </div>
+      <div class="col-1"></div>
+      <div class="col-3">
+       Game
+       <h4><%= @log.game.name %></h4>
+          <%#= f.select :game_id, options_from_collection_for_select(Game.all.order(name: :asc), "id", "name", @game.id), {}, { class: 'form-control chosen-container chosen-container-single chosen-select'} %>
+        </div>
+    </div>
+      <br>
+    <div class="row">
+      <div class="col-6">
+        <%= f.submit "Update Benchmark", id: 'submit', class: 'btn btn-primary' %>
+        <%= link_to "View Benchmark", game_log_path(@game, @log), class: 'btn btn-success' if @log.uploads.any? %><br>
+      </div>
+    </div>
+  <%#= select_tag "type_id", options_from_collection_for_select(Type.all, "id", "name") %>
+<% end %>
+
+<script type="text/javascript">
+  function hasFile(element){
+    if ($(element).get(0).files.length === 0) {
+      $('#submit').prop('disabled', true)
+    } else {
+      $('#submit').prop('disabled', false)
+    }
+  }
+  <% if @log.uploads.empty? %>
+    hasFile("#log_uploads")
+    $("#log_uploads").change(function(){
+      console.log('Uploads changed')
+      hasFile(this);
+    })
+  <% end %>
+</script>
