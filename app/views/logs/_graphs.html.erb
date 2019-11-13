@@ -1,10 +1,10 @@
-<%= line_chart log_fps_path(@log), colors: Bench::COLORS,
+<%= line_chart fps_game_log_path(@log), colors: Bench::COLORS,
    points: false, curve: false, download: true, title: 'FPS', id: 'fps',
    library: {yAxis: {min: @log.min}, subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}}, height: '400px' %>
-<%= line_chart log_frametime_path(@log), colors: Bench::COLORS,
+<%= line_chart frametime_game_log_path(@log), colors: Bench::COLORS,
    points: false, curve: false, download: true, title: 'Frame Time', id: 'frametime',
    library: {yAxis: {min: 1000 / @log.max},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px' %>
-<%= bar_chart log_bar_path(@log), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Min/Max/Average', id: 'bar', ytitle: "FPS",
+<%= bar_chart bar_game_log_path(@log), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Min/Max/Average', id: 'bar', ytitle: "FPS",
 library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px' %> 
 <br>
 <% if @log.compare_to != nil %>

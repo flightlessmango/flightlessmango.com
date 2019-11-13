@@ -20,14 +20,14 @@
 <% end %>
     
     <!-- <div id="spider"></div> -->
-    <%= line_chart benches_game_fps_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
+    <%= line_chart fps_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
        points: false, curve: false, download: true, title: 'FPS', id: 'fps', xtitle: "Time", ytitle: "FPS",
        library: {yAxis: {min: @benchmark.inputs.minimum(:fps)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}}, height: '400px' %>
-    <%= line_chart benches_game_full_frametime_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
+    <%= line_chart full_frametime_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
        points: false, curve: false, download: true, title: 'Frame Time', id: 'frametime', xtitle: "Time", ytitle: "Ms",
         library: {yAxis: {min: @benchmark.inputs.minimum(:frametime)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px'  %>
     <br>
-    <%= bar_chart benches_game_bar_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id,
+    <%= bar_chart bar_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id,
      bench_id: @benchmark.id).last.id), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Average', id: 'bar', ytitle: "FPS",
      library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
     <%#= line_chart benches_game_gpu_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),

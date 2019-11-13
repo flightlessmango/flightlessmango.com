@@ -7,7 +7,7 @@
 </style>
 <h1 class="text-center"><%= @benchmark.name %></h1>
 <h3 class="text-center"><%= @benchmark.inputs.last.game.name %></h3>
-<%= bar_chart benches_game_bar_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id,
+<%= bar_chart bar_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id,
  bench_id: @benchmark.id).last.id), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Min/Max/Avg', id: 'bar', ytitle: "FPS", library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px' %> 
 <%= render partial: 'stats', locals: {types: BenchesGame.where(bench_id: @benchmark.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id).first.id} %>
 <button id="hide" onclick="hide()">Hide</button> 
