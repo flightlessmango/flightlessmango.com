@@ -12,10 +12,10 @@
       <% end %>
       <div class="card-body">
         <p class="card-text">
-          <%= link_to game.name, game %><br>
           <% if game.steamid.nil? %>
           <br>
           <% end %>
+          <%= link_to game.name, game %>
         </p>
       </div>
     </div>
