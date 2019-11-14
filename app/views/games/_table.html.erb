@@ -15,9 +15,17 @@
           <% end %>
           <%= link_to game.name, game %>
         </p>
+            <div class="row">
+              <div class="col-10">
+                <%= link_to game.name, game %>
+              </div>
+              <div class="col-2" style="padding-right 10px;">
+                <a class="badge badge-pill badge-mango"><%= game.logs.count %></a>
+              </div>
+            </div>
+          </p>
       </div>
     </div>
   </div>
-  <br>
  <% end %> 
 </div>
