@@ -1,10 +1,11 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  has_many :logs
+  has_many :computers
   devise :database_authenticatable, #:registerable,
          :rememberable, :omniauthable, omniauth_providers: %i[discord]
  
   def self.from_omniauth(auth)
+   self.update_omniauth_user(auth)
    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
      password = Devise.friendly_token[0, 20]
      user.email = auth.uid
@@ -18,9 +19,13 @@ class User < ApplicationRecord
      #user.skip_confirmation!
    end
   end
- 
-  has_many :logs
-  has_many :computers
+  
+  def self.update_omniauth_user(auth)
+    if User.where(provider: auth.provider, uid: auth.uid).any?
+      User.where(provider: auth.provider, uid: auth.uid).last.update(username: auth.info.name, image: auth.info.image)
+    end
+  end
+
   
   def email_required?
     false
