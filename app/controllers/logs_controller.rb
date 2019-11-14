@@ -62,6 +62,13 @@ class LogsController < ApplicationController
   end
 end
 
+def destroy
+  @log = Log.find(params[:id])
+  @log.destroy
+ 
+  redirect_to user_path(current_user)
+end
+
 def frametime
   @log = Log.find(params[:id])
   render json: @log.frametime

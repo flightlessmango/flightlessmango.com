@@ -1,5 +1,10 @@
 <% if @log.user == current_user %>
-  <%= link_to "Edit", edit_game_log_path(@game, @log), class: 'btn btn-warning' %>
+  <%= link_to "Edit Benchmark", edit_game_log_path(@game, @log), class: 'btn btn-warning' %>
+  <%= link_to "Remove Benchmark",
+              game_log_path(@game, @log),
+              :method => :delete,
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger float-right', remote: false %>
 <% end %>
 <div class="container">
   <div class="row">
