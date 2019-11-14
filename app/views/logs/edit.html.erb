@@ -1,4 +1,4 @@
-<% if @log.user != current_user || !current_user.admin %>
+<% if @log.user != current_user || current_user.admin? %>
   <% raise :error %>
 <% else %>
   <%= render 'upload' %>
