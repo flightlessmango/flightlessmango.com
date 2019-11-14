@@ -1,29 +1,26 @@
 <%= render partial: 'layouts/paginate', locals: {games: games} %>
 <div class="row" id="gamesList">
 <% games.order(name: :asc).each do |game| %>
-  <div class="col-6 col-sm-3 my-2">
+  <div class="col-6 col-sm-4 col-md-3 my-2">
     <div class="card">
+      <div class="">
       <% if game.steamid.nil? %>
-        <%= link_to image_tag("https://lutris.net" + game.image_url, class: 'card-img-top'), game_path(game) %>
+        <div style="background-color:black; padding: 2.5%;"></div>
+          <%= link_to image_tag("https://lutris.net" + game.image_url, class: 'card-img-top'), game_path(game) %>
+        <div style="background-color:black; padding: 2.5%;"></div>
       <% else %>
         <%= link_to image_tag("https://steamcdn-a.akamaihd.net/steam/apps/" + game.steamid.to_s + "/header.jpg", class: 'card-img-top'), game_path(game) %>
       <% end %>
+    </div>
       <div class="card-body">
-        <p class="card-text">
-          <% if game.steamid.nil? %>
-          <br>
-          <% end %>
-          <%= link_to game.name, game %>
-        </p>
-            <div class="row">
-              <div class="col-10">
-                <%= link_to game.name, game %>
-              </div>
-              <div class="col-2" style="padding-right 10px;">
-                <a class="badge badge-pill badge-mango"><%= game.logs.count %></a>
-              </div>
-            </div>
-          </p>
+        <div class="row">
+          <div class="col-10">
+            <h5 class="card-title"><%= link_to game.name, game %></h5> 
+          </div>
+          <div class="col-2" style="padding-right 10px;">
+            <a class="badge badge-pill badge-mango"><%= game.logs.count %></a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
