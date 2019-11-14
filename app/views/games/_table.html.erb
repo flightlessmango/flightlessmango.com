@@ -6,7 +6,7 @@
 <% end %>
 
 <%= will_paginate(games, :renderer => WillPaginate::ActionView::Bootstrap4LinkRenderer,
- :previous_label => 'Back', :next_label => 'Next', inner_window: 0, outer_window: 0,
+ :previous_label => 'Back', :next_label => 'Next', inner_window: 1, outer_window: 0,
  :params => { q: hash },
   class: 'd-flex') %>
 <div class="row" id="gamesList">
