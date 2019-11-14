@@ -5,10 +5,20 @@
   <% end %>
 <% end %>
 
-<%= will_paginate(games, :renderer => WillPaginate::ActionView::Bootstrap4LinkRenderer,
- :previous_label => 'Back', :next_label => 'Next', inner_window: 1, outer_window: 0,
- :params => { q: hash },
-  class: 'd-flex') %>
+<!-- Desktop -->
+<div class="d-none d-sm-block">
+  <%= will_paginate(games, :renderer => WillPaginate::ActionView::Bootstrap4LinkRenderer,
+   :previous_label => 'Back', :next_label => 'Next', inner_window: 1, outer_window: 0,
+   :params => { q: hash },
+    class: 'd-flex') %>
+</div>
+<!-- Mobile -->
+<div class="d-sm-none">
+  <%= will_paginate(games, :renderer => WillPaginate::ActionView::Bootstrap4LinkRenderer,
+   :previous_label => 'Back', :next_label => 'Next', inner_window: 0, outer_window: 0,
+   :params => { q: hash },
+    class: 'd-flex') %>
+</div>
 <div class="row" id="gamesList">
 <% games.order(name: :asc).each do |game| %>
   <div class="col-6 col-sm-3 my-2">
