@@ -9,7 +9,10 @@
       <div class="funkyradio">
           <div class="funkyradio-mango">
               <%= f.check_box :logs_game_id_not_null %>
-              <label for="q_logs_game_id_not_null">Has Benchmarks</label>
+              <!-- Desktop -->
+              <label for="q_logs_game_id_not_null" class="d-none d-sm-block">Has Benchmarks</label>
+              <!-- Mobile -->
+              <label for="q_logs_game_id_not_null" class="d-sm-none">Benchmarks</label>
           </div>
       </div>
   </div>
@@ -28,9 +31,3 @@
     </div>
   </div>
 </div>
-
-<script type="text/javascript">
-  <!-- $(document).on('turbolinks:load', () => $('#game_search input').keyup(function() {
-    $.get($('#game_search').attr('action'), $('#game_search').serialize(), null, 'script');
-  })); -->
-</script>
