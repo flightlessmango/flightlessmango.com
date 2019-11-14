@@ -1,0 +1,22 @@
+<!-- Adding ransack search params to pagination -->
+<% hash = {} %>
+<% unless params[:q].nil? %>
+  <% params[:q].each do |param| %>
+   <% hash[param[0]] = param[1] %>
+  <% end %>
+<% end %>
+
+<!-- Desktop -->
+<div class="d-none d-sm-block">
+  <%= will_paginate(games, :renderer => WillPaginate::ActionView::Bootstrap4LinkRenderer,
+   :previous_label => 'Back', :next_label => 'Next', inner_window: 1, outer_window: 0,
+   :params => { q: hash },
+    class: 'd-flex') %>
+</div>
+<!-- Mobile -->
+<div class="d-sm-none">
+  <%= will_paginate(games, :renderer => WillPaginate::ActionView::Bootstrap4LinkRenderer,
+   :previous_label => 'Back', :next_label => 'Next', inner_window: 0, outer_window: 0,
+   :params => { q: hash },
+    class: 'd-flex') %>
+</div>
