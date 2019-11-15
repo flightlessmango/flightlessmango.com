@@ -11,7 +11,7 @@ class GamesController < ApplicationController
   
   def user_benchmarks
     @q = Game.ransack(params[:q])
-    @games = @q.result(distinct: true).where.not(source: 'mango').includes(:logs).paginate(page: params[:page], per_page: 30)
+    @games = @q.result(distinct: true).where.not(source: 'mango', steam_type: 'non-game').includes(:logs).paginate(page: params[:page], per_page: 30)
     respond_to do |format|
       format.html
       format.js
