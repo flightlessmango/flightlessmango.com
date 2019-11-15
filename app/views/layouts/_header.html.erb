@@ -50,6 +50,8 @@
              <% if current_user.admin? %>
              <%= link_to('Dashboard', dashboard_users_path, class: 'dropdown-item') %>
              <% end %>
+             <%= link_to('My Benchmarks', current_user, class: 'dropdown-item') %>
+             <div class="dropdown-divider"></div>
              <%= link_to('Logout', destroy_user_session_path, method: :delete, class: 'dropdown-item') %>
          </div>
          </li>
