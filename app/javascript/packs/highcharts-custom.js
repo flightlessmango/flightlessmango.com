@@ -37,6 +37,9 @@ Highcharts.theme = {
         },
         plotBorderColor: '#606063'
     },
+    boost: {
+        useGPUTranslations: true
+    },
     title: {
         style: {
             color: '#E0E0E3',
@@ -92,7 +95,7 @@ Highcharts.theme = {
         series: {
           visible: true,
           animation: {
-            duration: 2000
+            duration: 0
           },
             borderColor: 'black',
             dataLabels: {

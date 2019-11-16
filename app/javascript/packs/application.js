@@ -21,6 +21,7 @@ import Highcharts from 'highcharts';
 addExporting(Highcharts)
 window.Highcharts = Highcharts;
 import addExporting from "highcharts/modules/exporting";
+import addBoost from "highcharts/modules/boost";
 import '../stylesheets/application'
 import toastr from 'toastr';
 import '../stylesheets/colorPick'
