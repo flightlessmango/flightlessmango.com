@@ -5,15 +5,88 @@
     overflow-x: hidden;
   }
 </style>
+<% if @benchmark.games.count > 1 %>
+<nav id="gameSelect">
+  <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
+    <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
+        <a class="nav-item nav-link <% if i == 0 %> active <% end %>" id="nav-game-tab-<%= game.id %>" data-toggle="tab" href="#nav-game-<%= game.id %>" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
+    <% end %>
+    <a class="nav-item nav-link" id="nav-game-tab-total" data-toggle="tab" href="#nav-game-total" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
+  </div>
+</nav>
+<div class="tab-content" id="pills-tabContent">
+  <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
+      <div class="tab-pane fade show <% if i == 0 %> active <% end %>" id="nav-game-<%= game.id %>" role="tabpanel" aria-labelledby="nav-game-tab-<%= game.id %>">
+        <h3 class="text-center"><%= game.name %></h3>
+      </div>
+  <% end %>
+  <div class="tab-pane fade show" id="nav-game-total" role="tabpanel" aria-labelledby="nav-game-tab-total">
+    <h3 class="text-center">Total</h3>
+  </div>
+</div>
+<% end %>
+<script type="text/javascript">
+  $('#spider').hide()
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  async function animateGraph(){
+    await sleep(5000)
+    for (var i = Highcharts.charts[0].series.length - 1; i >= 0; i--) {
+      Highcharts.charts[0].series[i].show()
+      await sleep(2500)
+    }
+  }
+  
+  $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+    if(this.id == "nav-game-tab-total"){
+      charts = ['fps', 'frametime', 'bar']
+      $.each(charts, function (i, value){
+        if(value == 'bar'){
+          chart = Chartkick.charts[value]
+          chart.updateData('/benchmarks/<%= @benchmark.id %>/' + 'totalbar')
+        }
+      })
+      $('#fps').hide()
+      $('#frametime').hide()
+      $('#spider').show()
+      $('#stats-table').html('<%= j render partial: 'benches/stats_total', locals: {types: BenchesGame.where(bench_id: @benchmark.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id).first.id} %>')
+    }
+    <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
+        if(this.id == "nav-game-tab-<%= game.id %>"){
+          $('#gameName').html("<%= raw game.name %>")
+          $('#spider').hide()
+          $('#fps').show()
+          $('#frametime').show()
+          $('#bar').show()
+          $('#stats-table').html('<%= j render partial: 'benches/stats', locals: {types: BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).first.id} %>')
+          charts = ['fps', 'frametime', 'bar']
+          $.each(charts, function (i, value){
+            chart = Chartkick.charts[value]
+            <% if game.inputs.count > 5000 %>
+              chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + value)
+            <% else %>
+              if(value == 'bar'){
+                chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + value)
+              } else {
+                chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + 'full_' + value)
+              }
+            <% end %>
+          })
+        }
+      <% end %>
+  })
+</script>
+<button id="hide" onclick="hide()">Hide</button> 
 <h1 class="text-center"><%= @benchmark.name %></h1>
-<h3 class="text-center"><%= @benchmark.inputs.last.game.name %></h3>
+<h3 class="text-center" id="gameName"><%= @benchmark.inputs.last.game.name %></h3>
 <%= line_chart fps_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
    points: false, curve: false, download: false, title: 'FPS', id: 'fps', xtitle: "Time", ytitle: "FPS",
    library: {yAxis: {min: @benchmark.inputs.minimum(:fps)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}}, height: '400px' %>
 <%= line_chart full_frametime_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
    points: false, curve: false, download: false, title: 'Frame Time', id: 'frametime', xtitle: "Time", ytitle: "Ms",
     library: {yAxis: {min: @benchmark.inputs.minimum(:frametime)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px'  %>
-     <button id="hide" onclick="hide()">Hide</button> 
+
     
 <script type="text/javascript">
   function hide(){
@@ -21,5 +94,7 @@
     $('.highcharts-button-box').hide()
     $('#hide').hide()
     $('.navbar').hide()
+    $('#gameSelect').hide()
+    $('#pills-tabContent').hide()
   }
 </script>
