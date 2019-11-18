@@ -54,7 +54,7 @@
               <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / @benchmark.types.where(name: 'CFS').last.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%
             <% end %>
             <% if @types.where(name: 'v0.50').any? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'v0.50').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+              <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / @benchmark.types.where(name: 'v0.50').last.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%
             <% end %>
           </td>
         </tr>
