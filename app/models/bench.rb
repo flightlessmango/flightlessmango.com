@@ -191,7 +191,7 @@ class Bench < ApplicationRecord
       gpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:gpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
       cpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:cpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
       onepercent = {}
-      benches_game.types.each do |type|
+      benches_game.types.order(name: :asc).each do |type|
         typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
         pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id)
         onepercent.store(type.name, typeInputs.where(id: pluck).average(:fps))
