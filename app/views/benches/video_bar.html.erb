@@ -98,8 +98,8 @@
   }
   async function animateGraph(){
     await sleep(5000)
-    for (var i = 0; i < Highcharts.charts[0].series.length; i++) {
-      Highcharts.charts[0].series[i].show()
+    for (var i = 0; i < Highcharts.charts[Highcharts.charts.length - 1].series.length; i++) {
+      Highcharts.charts[Highcharts.charts.length - 1].series[i].show()
       await sleep(2500)
     }
   }
