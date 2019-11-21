@@ -97,92 +97,11 @@ class Bench < ApplicationRecord
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
   
-  def bar
-    benches_game = BenchesGame.last
-    min = {}
-    avg = {}
-    max = {}
-    onepercent = {}
-    benches_game.types.each do |type|
-      typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
-      min.store(type.name, typeInputs.minimum(:fps).to_f)
-    end
-    benches_game.types.each do |type|
-      compare = 0
-      min.each do |test|
-        if test.first == type.name
-          compare = test.second.to_f
-        end
-      end
-      typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
-      pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id)
-      onepercent.store(type.name, (typeInputs.where(id: pluck).average(:fps) - compare).to_f)
-    end
-    benches_game.types.each do |type|
-      compare = 0
-      min.each do |x|
-        if x.first == type.name
-          onepercent.each do |y|
-            if x.first == type.name
-              compare = x.second.to_f + y.second.to_f
-            end 
-          end
-        end
-      end
-      typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
-      avg.store(type.name, (typeInputs.average(:fps) - compare).to_f)
-    end
-    benches_game.types.each do |type|
-      compare = 0
-      min.each do |x|
-        if x.first == type.name
-          onepercent.each do |y|
-            if x.first == type.name
-              avg.each do |z|
-                if z.first == type.name
-                  compare = x.second.to_f + y.second.to_f + z.second.to_f
-                end
-              end
-            end 
-          end
-        end
-      end
-      typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
-      max.store(type.name, (typeInputs.maximum(:fps) - compare).to_f)
-    end
-    bar_chart = [
-            {
-              name: 'Max',
-              data: max
-            },
-            {
-              name: 'Average',
-              data: avg
-            },
-            {
-              name: '1% Min',
-              data: onepercent
-            },
-            # {
-            #   name: '1% Min',
-            #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.1).pluck(:id)).joins(:type).group('types.name').average(:fps),
-            # },
-            # {
-            #   name: '0.1% Min',
-            #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.01).pluck(:id)).joins(:type).group('types.name').average(:fps),
-            # },
-            {
-              name: 'Min',
-              data: min,
-            }
-          ]
-     benches_game.update(bar: bar_chart)
-  end
-  
   def refresh_json
     Input.where(fps: 0).delete_all
     onepercent = {}
     self.games.each do |game|
+
       benches_game = BenchesGame.where(game_id: game.id, bench_id: self.id).last
       fps_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 2 == 0 }.compact.pluck(:id)).group(:pos).average(:fps), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
       frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 2 == 0 }.compact.pluck(:id)).group(:pos).average(:frametime), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
@@ -199,7 +118,7 @@ class Bench < ApplicationRecord
       bar_chart = [
               {
                 name: 'Min',
-                data: benches_game.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').minimum(:fps),
+                data: benches_game.inputs.joins(:type).group('types.name').order('types.name ASC').minimum(:fps),
               },
               {
                 name: '1% Min',
@@ -207,11 +126,11 @@ class Bench < ApplicationRecord
               },
               {
                 name: 'Avg',
-                data: benches_game.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').average(:fps),
+                data: benches_game.inputs.joins(:type).group('types.name').order('types.name ASC').average(:fps),
               },
               {
                 name: 'Max',
-                data: benches_game.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').maximum(:fps),
+                data: benches_game.inputs.joins(:type).group('types.name').order('types.name ASC').maximum(:fps),
               },
 
 
@@ -225,7 +144,9 @@ class Bench < ApplicationRecord
               # },
 
             ]
-      benches_game.update(fps: fps_chart, frametime: frametime_chart, full_fps: full_fps_chart, full_frametime: full_frametime_chart, bar: bar_chart, gpu: gpu_chart, cpu: cpu_chart)
+      benches_game.update(fps: fps_chart, frametime: frametime_chart, full_fps: full_fps_chart,
+                          full_frametime: full_frametime_chart, bar: bar_chart, gpu: gpu_chart,
+                          cpu: cpu_chart, min: benches_game.inputs.minimum(:fps), max: benches_game.inputs.maximum(:fps))
     end
     if self.games.count > 0
       totalbar_chart = [
