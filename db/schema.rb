@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_15_055345) do
+ActiveRecord::Schema.define(version: 2019_11_21_123837) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -84,6 +84,8 @@ ActiveRecord::Schema.define(version: 2019_11_15_055345) do
     t.jsonb "bar"
     t.jsonb "cpu"
     t.jsonb "gpu"
+    t.integer "min"
+    t.integer "max"
   end
 
   create_table "computers", force: :cascade do |t|
