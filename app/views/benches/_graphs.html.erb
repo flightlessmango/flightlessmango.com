@@ -40,7 +40,7 @@
     <br>
     <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Average', id: 'bar', ytitle: "FPS",
      library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
-    <%= column_chart [], colors: Bench::TWENTY, id: 'total_cpu', library: { plotOptions: { column: { colorByPoint: true }}} %>
+    <%= column_chart [], colors: Bench::TWENTY, title: 'Average CPU Load', id: 'total_cpu', library: { plotOptions: { column: { colorByPoint: true }}} %>
     
     <%= render partial: 'stats', locals: {types: BenchesGame.where(bench_id: @benchmark.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id, game_id: @benchmark.games.order(name: :asc).first.id).first.id} %>
     <%#= render 'spidergraph' %>
