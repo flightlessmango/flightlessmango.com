@@ -1,5 +1,5 @@
 class BenchesController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar, :recording]
+  before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar, :total_cpu, :recording]
   def index
     if user_signed_in? && current_user.admin?
       @benchmarks = Bench.all
@@ -100,6 +100,11 @@ end
   def totalbar
     @benchmark = Bench.friendly.find(params[:id])
     render json: @benchmark.totalbar
+  end
+
+  def total_cpu
+    @benchmark = Bench.friendly.find(params[:id])
+    render json: @benchmark.totalcpu
   end
   
   def video_total

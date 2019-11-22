@@ -175,7 +175,8 @@ class Bench < ApplicationRecord
               #   data: self.inputs.where(bench_id: self.id).joins(:type).order('types.name').group('types.name').minimum(:fps),
               # }
             ]
-            self.update(totalbar: totalbar_chart)
+            totalcpu_chart = self.inputs.joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
+            self.update(totalbar: totalbar_chart, totalcpu: totalcpu_chart)
       end
   end
   
