@@ -18,6 +18,34 @@
   <% if @benchmark.apis.count > 1 %>
     <%= render 'graphs_apis' %>
   <% else %>
-    <%= render 'graphs' %>
+    <% if @benchmark.games.count > 1 %>
+    <nav>
+      <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
+        <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
+            <a class="nav-item nav-link <% if i == 0 %> active <% end %>" id="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>" data-toggle="tab" href="#nav-game-<%= game.id %>-bench-<%= @benchmark.id %>" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
+        <% end %>
+        <a class="nav-item nav-link" id="nav-game-tab-total-bench-<%= @benchmark.id %>" data-toggle="tab" href="#nav-game-total-bench-<%= @benchmark.id %>" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
+      </div>
+    </nav>
+    <div class="tab-content" id="pills-tabContent">
+      <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
+          <div class="tab-pane fade show <% if i == 0 %> active <% end %>" id="nav-game-<%= game.id %>-bench-<%= @benchmark.id %>" role="tabpanel" aria-labelledby="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>">
+            <h3 class="text-center"><%= game.name %></h3>
+            <% benches_game = BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last %>
+            <%= render partial: 'graphs', locals: {benches_game: benches_game} %>
+          </div>
+      <% end %>
+      <div class="tab-pane fade show" id="nav-game-total-bench-<%= @benchmark.id %>" role="tabpanel" aria-labelledby="nav-game-tab-total">
+        <h3 class="text-center">Total</h3>
+        <%= bar_chart totalbar_bench_path(@benchmark), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Average', ytitle: "FPS",
+        library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
+        <%= column_chart total_cpu_bench_path(@benchmark), colors: Bench::TWENTY, title: 'Average CPU Load', height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+        <%= render 'stats_total' %>
+      </div>
+    </div>
+    <% else %>
+      <% benches_game = BenchesGame.where(game_id: @benchmark.games.first.id, bench_id: @benchmark.id).last %>
+      <%= render partial: 'graphs', locals: {benches_game: benches_game} %>
+    <% end %>
   <% end %>
 <% end %>

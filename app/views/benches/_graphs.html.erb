@@ -1,62 +1,12 @@
-<% if @benchmark.games.count > 1 %>
-<nav>
-  <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
-    <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
-        <a class="nav-item nav-link <% if i == 0 %> active <% end %>" id="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>" data-toggle="tab" href="#nav-game-<%= game.id %>-bench-<%= @benchmark.id %>" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
-    <% end %>
-    <a class="nav-item nav-link" id="nav-game-tab-total-bench-<%= @benchmark.id %>" data-toggle="tab" href="#nav-game-total-bench-<%= @benchmark.id %>" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
-  </div>
-</nav>
-<div class="tab-content" id="pills-tabContent">
-  <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
-      <div class="tab-pane fade show <% if i == 0 %> active <% end %>" id="nav-game-<%= game.id %>-bench-<%= @benchmark.id %>" role="tabpanel" aria-labelledby="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>">
-        <h3 class="text-center"><%= game.name %></h3>
-            
-          <% benches_game = BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last %>
-          
-          <%= line_chart full_fps_benches_game_path(benches_game),
-            points: false, curve: false, download: true, title: 'FPS', xtitle: "Time", ytitle: "FPS",
-            library: {tooltip: {shared: true},yAxis: {min: benches_game.min}, xAxis: {labels: {enabled: false}},
-            subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}}, height: '400px' %>
-          
-          <%= line_chart full_frametime_benches_game_path(benches_game),
-              points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
-              library: {tooltip: {shared: true},yAxis: {min: 1000 / benches_game.max}, xAxis: {labels: {enabled: false}},
-              subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px' %>
-          <% if !benches_game.inputs.where(gpu: nil).any? %>
-            <%= line_chart cpu_benches_game_path(benches_game),
-            points: false, curve: false, download: true, title: 'CPU Load', xtitle: "Time", ytitle: "Load",
-            library: {tooltip: {shared: true},yAxis: {max: 100}, xAxis: {labels: {enabled: false}},
-              subtitle: {useHTML: true}}, height: '400px' %>
-          <% end %>
-
-          <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Min/Avg/Max', ytitle: "FPS",
-            library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
-
-          <%= render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>
-      </div>
-  <% end %>
-  <div class="tab-pane fade show" id="nav-game-total-bench-<%= @benchmark.id %>" role="tabpanel" aria-labelledby="nav-game-tab-total">
-    <h3 class="text-center">Total</h3>
-    <%= bar_chart totalbar_bench_path(@benchmark), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Average', ytitle: "FPS",
-    library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
-    <%= column_chart total_cpu_bench_path(@benchmark), colors: Bench::TWENTY, title: 'Average CPU Load', height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
-    <%= render 'stats_total' %>
-  </div>
-</div>
-<% else %>
-  <% benches_game = BenchesGame.where(game_id: @benchmark.games.first.id, bench_id: @benchmark.id).last %>
-            
   <%= line_chart full_fps_benches_game_path(benches_game),
     points: false, curve: false, download: true, title: 'FPS', xtitle: "Time", ytitle: "FPS",
     library: {tooltip: {shared: true},yAxis: {min: benches_game.min}, xAxis: {labels: {enabled: false}},
     subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}}, height: '400px' %>
-
+  
   <%= line_chart full_frametime_benches_game_path(benches_game),
       points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
       library: {tooltip: {shared: true},yAxis: {min: 1000 / benches_game.max}, xAxis: {labels: {enabled: false}},
       subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px' %>
-
   <% if !benches_game.inputs.where(gpu: nil).any? %>
     <%= line_chart cpu_benches_game_path(benches_game),
     points: false, curve: false, download: true, title: 'CPU Load', xtitle: "Time", ytitle: "Load",
@@ -64,8 +14,7 @@
       subtitle: {useHTML: true}}, height: '400px' %>
   <% end %>
 
-  <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Average', ytitle: "FPS",
-  library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
+  <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Min/Avg/Max', ytitle: "FPS",
+    library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
 
   <%= render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>
-<% end %>
