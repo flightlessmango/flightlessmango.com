@@ -27,7 +27,7 @@
         <a class="nav-item nav-link" id="nav-game-tab-total-bench-<%= @benchmark.id %>" data-toggle="tab" href="#nav-game-total-bench-<%= @benchmark.id %>" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
       </div>
     </nav>
-    <div class="tab-content" id="pills-tabContent">
+    <div class="tab-content" id="pills-tabContent" style="padding: 25px 0px 0px;">
       <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
           <div class="tab-pane fade show <% if i == 0 %> active <% end %>" id="nav-game-<%= game.id %>-bench-<%= @benchmark.id %>" role="tabpanel" aria-labelledby="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>">
             <h3 class="text-center"><%= game.name %></h3>
@@ -49,3 +49,6 @@
     <% end %>
   <% end %>
 <% end %>
+<script>
+
+</script>
