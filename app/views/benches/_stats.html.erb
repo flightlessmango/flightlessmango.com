@@ -1,4 +1,4 @@
-<table class="table table-bordered" id="stats-table">
+<table class="table table-bordered" id="stats-table-game-<%= BenchesGame.find(benches_game_id).game.id %>">
  <thead class="thead-dark">
     <tr>
         <th>Name</th>
@@ -60,3 +60,4 @@
         </tr>
        <% end %>
      </tbody>
+    </table>

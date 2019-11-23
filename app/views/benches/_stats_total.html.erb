@@ -1,4 +1,4 @@
-<table class="table table-bordered" id="stats-table">
+<table class="table table-bordered" id="stats-table-total">
  <thead class="thead-dark">
     <tr>
         <th>Name</th>
@@ -27,7 +27,7 @@
     </tr>
  </thead>
      <tbody style="color: white;">
-       <% types.order(name: :desc).each do |type| %>
+       <% @types.order(name: :desc).each do |type| %>
        <% typeInputs = type.inputs.where(bench_id: @benchmark.id) %>
        <% pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id) %>
        <% onepercent = typeInputs.where(id: pluck).average(:fps) %>
@@ -60,3 +60,4 @@
         </tr>
        <% end %>
      </tbody>
+  </table>
