@@ -27,7 +27,7 @@
     </tr>
  </thead>
      <tbody style="color: white;">
-       <% types.order(name: :desc).each do |type| %>
+       <% types.order(name: :asc).each do |type| %>
        <% typeInputs = type.inputs.where(benches_game_id: benches_game_id) %>
        <% pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id) %>
        <% onepercent = typeInputs.where(id: pluck).average(:fps) %>
