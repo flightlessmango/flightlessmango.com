@@ -1,0 +1,5 @@
+<h3 class="text-center">Total</h3>
+<%= bar_chart totalbar_bench_path(benchmark), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Average', ytitle: "FPS",
+library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
+<%= column_chart total_cpu_bench_path(benchmark), colors: Bench::TWENTY, title: 'Average CPU Load', height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+<%= render partial: 'stats_total', locals: {types: benchmark.types} %>

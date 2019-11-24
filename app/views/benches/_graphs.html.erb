@@ -1,20 +1,27 @@
+<div id=gameContent>
+<h3 class="text-center" id="gameTitle"><%= benches_game.game.name %></h3>
   <%= line_chart full_fps_benches_game_path(benches_game),
-    points: false, curve: false, download: true, title: 'FPS', xtitle: "Time", ytitle: "FPS",
+    points: false, curve: false, download: true, title: 'FPS', xtitle: "Time", ytitle: "FPS", id: 'fps',
     library: {tooltip: {shared: true},yAxis: {min: benches_game.min}, xAxis: {labels: {enabled: false}},
     subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}}, height: '400px' %>
   
   <%= line_chart full_frametime_benches_game_path(benches_game),
-      points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
+      points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms", id: 'frametime',
       library: {tooltip: {shared: true},yAxis: {min: 1000 / benches_game.max}, xAxis: {labels: {enabled: false}},
       subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px' %>
+  
   <% if !benches_game.inputs.where(gpu: nil).any? %>
     <%= line_chart cpu_benches_game_path(benches_game),
-    points: false, curve: false, download: true, title: 'CPU Load', xtitle: "Time", ytitle: "Load",
+    points: false, curve: false, download: true, title: 'CPU Load', xtitle: "Time", ytitle: "Load", id: 'cpu',
     library: {tooltip: {shared: true},yAxis: {max: 100}, xAxis: {labels: {enabled: false}},
       subtitle: {useHTML: true}}, height: '400px' %>
   <% end %>
 
-  <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Min/Avg/Max', ytitle: "FPS",
+  <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
     library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
 
-  <%= render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>
+
+  <div id="gameStats">
+    <%= render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>
+  </div>
+</div>

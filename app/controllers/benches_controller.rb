@@ -12,6 +12,10 @@ class BenchesController < ApplicationController
     @benchmark = Bench.friendly.find(params[:id])
     @types = Type.where(name: @benchmark.inputs.joins(:type).pluck(:'types.name').uniq)
     @games = @benchmark.games
+    respond_to do |format|
+      format.html {}
+      format.js
+    end
   end
   
   def new
