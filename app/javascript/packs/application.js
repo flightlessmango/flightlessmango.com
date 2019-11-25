@@ -15,8 +15,8 @@ require("bootstrap")
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
-require("chartkick").use(require("highcharts"))
 require("chart.js")
+require("chartkick")
 import Highcharts from 'highcharts';
 addExporting(Highcharts)
 window.Highcharts = Highcharts;
@@ -28,6 +28,7 @@ import '../stylesheets/colorPick'
 require("packs/highcharts-custom.js")
 require("packs/colorPick.js")
 require("packs/custom.js")
+require("packs/chartjs-custom.js")
 require("packs/google_analytics.js.erb")
 import '@fortawesome/fontawesome-free/js/fontawesome'
 import '@fortawesome/fontawesome-free/js/solid'
