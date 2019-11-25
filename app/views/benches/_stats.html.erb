@@ -1,6 +1,7 @@
 <table class="table table-bordered" id="stats-table-game-<%= BenchesGame.find(benches_game_id).game.id %>">
  <thead class="thead-dark">
     <tr>
+        <th>Color</th>
         <th>Name</th>
         <th class="d-none d-sm-block">Min</th>
         <th>1% Min</th>
@@ -32,6 +33,7 @@
        <% pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id) %>
        <% onepercent = typeInputs.where(id: pluck).average(:fps) %>
         <tr>
+          <td style="background-color: <%= type.inputs.last.color%>; width: 5%;"</td>
           <td><%= type %></td>
           <td class="d-none d-sm-block"><%= typeInputs.minimum(:fps).to_i %></td>
           <td><%= onepercent.to_i %></td>
