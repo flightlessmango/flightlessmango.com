@@ -3,6 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.6.4'
 
+gem 'browser'
 gem 'will_paginate-bootstrap'
 gem 'will_paginate', '~> 3.1.0'
 gem 'ransack', github: 'activerecord-hackery/ransack'
