@@ -148,36 +148,11 @@ class Bench < ApplicationRecord
                           full_frametime: full_frametime_chart, bar: bar_chart.chart_json, gpu: gpu_chart,
                           cpu: cpu_chart, min: benches_game.inputs.minimum(:fps), max: benches_game.inputs.maximum(:fps))
     end
-    if self.games.count > 0
-      totalbar_chart = [
-              # {
-              #   name: 'Max',
-              #   data: self.inputs.where(bench_id: self.id).joins(:type).order('types.name').group('types.name').maximum(:fps),
-              # },
-              {
-                name: 'Avg',
-                data: self.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').average(:fps)
-              },
-              # {
-              #   name: '1% Min',
-              #   data: onepercent
-              # },
-              # {
-              #   name: '1% Min',
-              #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.1).pluck(:id)).joins(:type).group('types.name').average(:fps),
-              # },
-              # {
-              #   name: '0.1% Min',
-              #   data: benches_game.inputs.where(bench_id: self.id).where(id: benches_game.inputs.order(fps: :asc).first(benches_game.inputs.count * 0.01).pluck(:id)).joins(:type).group('types.name').average(:fps),
-              # },
-              # {
-              #   name: 'Min',
-              #   data: self.inputs.where(bench_id: self.id).joins(:type).order('types.name').group('types.name').minimum(:fps),
-              # }
-            ]
-            totalcpu_chart = self.inputs.joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
-            self.update(totalbar: totalbar_chart.chart_json, totalcpu: totalcpu_chart)
-      end
+    if self.games.count > 1
+      totalbar_chart = self.types.order(name: :asc).map {|type| {name: type.name, data: type.inputs.group(:type).average(:fps)}}
+      totalcpu_chart = self.inputs.joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
+      self.update(totalbar: totalbar_chart.chart_json, totalcpu: totalcpu_chart)
+    end
   end
   
   def refresh_json_api
