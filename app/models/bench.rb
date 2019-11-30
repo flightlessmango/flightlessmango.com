@@ -149,7 +149,7 @@ class Bench < ApplicationRecord
                           cpu: cpu_chart, min: benches_game.inputs.minimum(:fps), max: benches_game.inputs.maximum(:fps))
     end
     if self.games.count > 1
-      totalbar_chart = self.types.order(name: :asc).map {|type| {name: type.name, data: type.inputs.where(bench: self).group(:type).average(:fps)}}
+      totalbar_chart = self.types.order(name: :asc).map {|type| {name: type.name, data: type.inputs.joins(:type).where(bench: self).group('types.name').average(:fps)}}
       totalcpu_chart = self.inputs.where(bench: self).joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
       self.update(totalbar: totalbar_chart.chart_json, totalcpu: totalcpu_chart)
     end
