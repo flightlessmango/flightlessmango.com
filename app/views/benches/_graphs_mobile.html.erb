@@ -1,3 +1,4 @@
+<script>Chartkick.charts = new Object()</script>
 <div id=gameContent>
     <h3 class="text-center" id="gameTitle"><%= benches_game.game.name %></h3>
     
@@ -25,3 +26,56 @@
         <%= render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>
     </div>
 </div>
+<script>
+        var num = 0;
+        function addCallback(name, chart){
+          switch(name){
+            case 'fps':
+              subtitleText = '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better';
+            break
+            case 'frametime':
+              subtitleText = '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'
+            break
+            case 'cpu':
+              subtitleText = "";
+            break
+            case 'bar':
+              subtitleText = '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'
+            break
+          }
+          var newOptions = {
+            library: {
+                subtitle: {
+                    useHTML: true,
+                    text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'
+                },
+              xAxis: {
+                labels: {
+                  enabled: false
+                }
+              },
+              tooltip: {
+                shared: true
+              },
+              chart: {
+                events: {
+                  load: function () {
+                    num++
+                    if (num == (Object.keys(Chartkick.charts).length * 2)){
+                      $('#loadingSpinner').hide()
+                      $('#gameContent').removeClass('d-none')
+                      $('#gameContent').addClass('animated fadeIn')
+                    }
+                  }
+                }
+              }
+            }
+          }
+        var mergedOptions = jQuery.extend(chart.options,newOptions)
+        chart.setOptions(mergedOptions);
+        } 
+        $.each(Chartkick.charts, function(name, chart) {
+          addCallback(name, chart);
+        })
+      
+      </script>
