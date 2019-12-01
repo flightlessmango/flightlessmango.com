@@ -1,16 +1,4 @@
 <% benches_game = BenchesGame.where(game_id: params[:game], bench_id: @benchmark.id).last %>
-function updateChart(chart, url){
-   $.getJSON( url, function( json ) {
-
-    $.each(json, function(i, set){
-        newData = []
-        $.each(set.data, function(x, data){
-            newData.push(parseFloat(data[1]))
-        })
-        Chartkick.charts[chart].chart.series[i].setData(newData)
-    })
-  })
- }
 <% if params[:type] == "full" %>
     <% if params[:game] != "total" %>
         <% if browser.device.mobile? %>
