@@ -1,5 +1,5 @@
 <% if user_signed_in? && current_user.admin?  %>
-   <%#= link_to "Edit", edit_bench_path(@benchmark), class: 'btn btn-warning' %>
+   <%= link_to "Edit", edit_bench_path(@benchmark), class: 'btn btn-success' %>
 <% end %>
 <% unless @benchmark.description.blank? %>
   <%= render 'modal_description' %>
