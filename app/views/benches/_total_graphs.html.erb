@@ -1,6 +1,48 @@
+<script>Chartkick.charts = new Object()</script>
+<div id=gameContent></div>
 <h3 class="text-center">Total</h3>
 <%= bar_chart totalbar_bench_path(benchmark), colors: Bench::TWENTY, title: 'Average', ytitle: "FPS",
 library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'},
 plotOptions: { series: { grouping: false}, column: { colorByPoint: true }}, xAxis: {visible: true }, tooltip: { headerFormat: ""}}, height: '500px', stacked: false %>
 <%= column_chart total_cpu_bench_path(benchmark), colors: Bench::TWENTY, title: 'Average CPU Load', height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
 <%= render partial: 'stats_total', locals: {types: benchmark.types} %>
+</div>
+<script>
+    $('#loadingSpinner').show()
+    $('#gameContent').addClass('d-none')
+    var num = 0;
+    var start = Date.now()
+    
+    function addCallback(chart){
+        var newOptions = {
+        library: {
+        plotOptions: {
+            column: {
+                colorByPoint: true
+            },
+            series: {
+                grouping: false
+            }
+        },
+        chart: {
+        events: {
+            load: function () {
+            num++
+            if (num == (Object.keys(Chartkick.charts).length * 2)){
+                $('#loadingSpinner').hide()
+                $('#gameContent').removeClass('d-none')
+                $('#gameContent').addClass('animated fadeIn')
+            }
+            }
+        }
+        }
+    }
+    }
+    var mergedOptions = jQuery.extend(chart.options,newOptions)
+    chart.setOptions(mergedOptions);
+    } 
+    $.each(Chartkick.charts, function(name, chart) {
+        addCallback(chart);
+    })
+    
+</script>
