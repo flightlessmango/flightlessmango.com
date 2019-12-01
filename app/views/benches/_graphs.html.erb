@@ -54,6 +54,15 @@
           }
         },
         tooltip: {
+          formatter: function() {
+              var s = '<b>'+ this.x +'</b>';
+
+              $.each(this.points, function(i, point) {
+                  s += '<br/><span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': ' + Math.round(point.y * 10) / 10;
+              });
+
+              return s;
+          },
           shared: true
         },
         chart: {

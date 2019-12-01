@@ -14,27 +14,34 @@ plotOptions: { series: { grouping: false}, column: { colorByPoint: true }}, xAxi
     function addCallback(chart){
         var newOptions = {
         library: {
-        plotOptions: {
-            column: {
-                colorByPoint: true
+            plotOptions: {
+                column: {
+                    colorByPoint: true
+                },
+                series: {
+                    grouping: false
+                }
             },
-            series: {
-                grouping: false
+            chart: {
+            events: {
+                load: function () {
+                num++
+                if (num == (Object.keys(Chartkick.charts).length * 2)){
+                    $('#loadingSpinner').hide()
+                    $('#gameContent').removeClass('d-none')
+                    $('#gameContent').addClass('animated fadeIn')
+                }
+                }
             }
-        },
-        chart: {
-        events: {
-            load: function () {
-            num++
-            if (num == (Object.keys(Chartkick.charts).length * 2)){
-                $('#loadingSpinner').hide()
-                $('#gameContent').removeClass('d-none')
-                $('#gameContent').addClass('animated fadeIn')
-            }
-            }
+            },
+            tooltip: {
+            formatter: function() {
+                var s = '<span style="color:' + this.point.color + '">\u25CF</span> ' + " " + '<b>'+ this.x +'</b>' + ": ";
+                s += Math.round(this.point.y * 10) / 10;
+                return s;
+            },
+            },
         }
-        }
-    }
     }
     var mergedOptions = jQuery.extend(chart.options,newOptions)
     chart.setOptions(mergedOptions);

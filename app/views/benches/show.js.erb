@@ -14,7 +14,7 @@
 <% if params[:type] == "fps" %>
     $('#mobileGraph').html("<%= j line_chart fps_benches_game_path(benches_game),
      points: false, curve: false, download: true, title: 'FPS', xtitle: "Time",
-     ytitle: "FPS", library: {tooltip: {shared: true},
+     ytitle: "FPS", library: {tooltip: {shared: true}, id: 'fps',
      yAxis: {min: benches_game.min}, xAxis: {labels: {enabled: false}},
      subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}},
      height: '400px' %>")
@@ -23,7 +23,7 @@
 <% if params[:type] == "frametime" %>
     $('#mobileGraph').html("<%= j line_chart frametime_benches_game_path(benches_game),
      points: false, curve: false, download: true, title: 'Frametime', xtitle: "Time",
-     ytitle: "Frame Time", library: {tooltip: {shared: true},
+     ytitle: "Frame Time", library: {tooltip: {shared: true}, id: 'frametime',
      yAxis: {min: 1000 / benches_game.max}, xAxis: {labels: {enabled: false}},
      subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}},
      height: '400px' %>")
@@ -35,4 +35,10 @@
     library: {tooltip: {shared: true},yAxis: {max: 100}, xAxis: {labels: {enabled: false}},
     subtitle: {useHTML: true}}, height: '400px'
      %>")
+<% end %>
+
+<% if browser.device.mobile? %>
+    $.each(Chartkick.charts, function(name, chart) {
+        addCallback(name, chart);
+    })
 <% end %>
