@@ -37,11 +37,7 @@
     </div>
     <div id="loadingSpinner" class="loader" style="margin-top: 50px; margin-bottom: 200px;"></div>
     <% else %>
-    <div class="row" id="loadingSpinner" style="margin-top: 50px; margin-bottom: 200px;">
-        <div class="col-12 text-center">
-          <i class="fas fa-circle-notch fa-spin fa-8x"></i>
-        </div>
-      </div>
+    <div id="loadingSpinner" class="loader" style="margin-top: 50px; margin-bottom: 200px;"></div>
       <% benches_game = BenchesGame.where(game_id: @benchmark.games.first.id, bench_id: @benchmark.id).last %>
       <% if browser.device.mobile? %>
         <%= render partial: 'graphs_mobile', locals: {benches_game: benches_game} %>
