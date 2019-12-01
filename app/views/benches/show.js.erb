@@ -1,3 +1,5 @@
+$('#loadingSpinner').show()
+$('#gameContent').addClass('d-none')
 <% benches_game = BenchesGame.where(game_id: params[:game], bench_id: @benchmark.id).last %>
 function updateChart(chart, url){
    $.getJSON( url, function( json ) {

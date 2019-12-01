@@ -8,8 +8,6 @@ plotOptions: { series: { grouping: false}, column: { colorByPoint: true }}, xAxi
 <%= render partial: 'stats_total', locals: {types: benchmark.types} %>
 </div>
 <script>
-    $('#loadingSpinner').show()
-    $('#gameContent').addClass('d-none')
     var num = 0;
     var start = Date.now()
     
