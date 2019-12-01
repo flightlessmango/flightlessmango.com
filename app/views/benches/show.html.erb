@@ -21,9 +21,9 @@
   <nav>
     <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
       <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
-      <a class="nav-item nav-link <% if i == 0 %> active <% end %>" data-remote="true" id="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=<%= game.id %>&type=full" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
+      <a class="nav-item nav-link <% if i == 0 %> active <% end %>" onclick="hideContent()" data-remote="true" id="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=<%= game.id %>&type=full" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
       <% end %>
-      <a class="nav-item nav-link" data-remote="true" id="nav-game-tab-total-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=total&type=full" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
+      <a class="nav-item nav-link" onclick="hideContent()" data-remote="true" id="nav-game-tab-total-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=total&type=full" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
     </div>
   </nav>
   <div class="tab-content" id="pills-tabContent" style="padding: 25px 0px 0px;">
@@ -35,13 +35,13 @@
       <% end %>
       
     </div>
-    <div class="row" id="loadingSpinner" style="margin-top: 150px;">
+    <div class="row" id="loadingSpinner" style="margin-top: 50px; margin-bottom: 200px;">
         <div class="col-12 text-center">
           <i class="fas fa-circle-notch fa-spin fa-8x"></i>
         </div>
       </div>
     <% else %>
-    <div class="row" id="loadingSpinner" style="margin-top: 150px;">
+    <div class="row" id="loadingSpinner" style="margin-top: 50px; margin-bottom: 200px;">
         <div class="col-12 text-center">
           <i class="fas fa-circle-notch fa-spin fa-8x"></i>
         </div>
@@ -57,6 +57,9 @@
 <% end %>
 
 <script>
-  $('#gameContent').addClass('d-none')
-  $('#loadingSpinner').show();
+  function hideContent(){
+    $('#gameContent').addClass('d-none')
+    $('#loadingSpinner').show();
+  }
+  hideContent();
 </script>

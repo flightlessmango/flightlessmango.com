@@ -1,5 +1,3 @@
-$('#loadingSpinner').show()
-$('#gameContent').addClass('d-none')
 <% benches_game = BenchesGame.where(game_id: params[:game], bench_id: @benchmark.id).last %>
 function updateChart(chart, url){
    $.getJSON( url, function( json ) {
@@ -39,7 +37,7 @@ function updateChart(chart, url){
      points: false, curve: false, download: true, title: 'Frametime', xtitle: "Time",
      ytitle: "Frame Time", library: {tooltip: {shared: true},
      yAxis: {min: 1000 / benches_game.max}, xAxis: {labels: {enabled: false}},
-     subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}},
+     subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}},
      height: '400px' %>")
 <% end %>
 
