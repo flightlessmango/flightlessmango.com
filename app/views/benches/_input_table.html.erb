@@ -12,18 +12,21 @@
       <th>Tools</th>
     </thead>
     <tbody>
-      <!-- fix this query, it's way too expensive -->
-      <%# game.types.joins(:inputs).where('inputs.bench_id = ?', @benchmark.id).each do |type| %>
-      <tr>
-        <td style="background-color: <%#= type.inputs.where(bench_id: @benchmark.id).first.color %>;"></td>
-        <td><%#= type.name %></td>
-        <td><%#= type.inputs.where(bench_id: @benchmark.id).minimum(:fps).to_i %></td>
-        <td><%#= type.inputs.where(bench_id: @benchmark.id).maximum(:fps).to_i %></td>
-        <td><%#= type.inputs.where(bench_id: @benchmark.id).average(:fps).to_i %></td>
-        <td><%#= type.inputs.where(bench_id: @benchmark.id).count %></td>
-        <td><%#= link_to 'Destroy All', delete_inputs_bench_path(@benchmark, :type => type.id, :benches_game_id => BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).last.id), class: 'btn btn-danger', remote: true %></td>
-      </tr>
-      <%# end %>
+      <% bench_types = @benchmark.types %>
+      <% game.types.each do |type| %>
+        <% if @benchmark.types.include? (type) %>
+          <% inputs = type.inputs.where(bench_id: @benchmark.id) %>
+          <tr>
+            <td style="background-color: <%= type.inputs.where(bench_id: @benchmark.id).first.color %>;"></td>
+            <td><%= type.name %></td>
+            <td><%= inputs.minimum(:fps).to_i %></td>
+            <td><%= inputs.maximum(:fps).to_i %></td>
+            <td><%= inputs.average(:fps).to_i %></td>
+            <td><%= inputs.count %></td>
+            <td><%= link_to 'Destroy All', delete_inputs_bench_path(@benchmark, :type => type.id, :benches_game_id => BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).last.id), class: 'btn btn-danger', remote: true %></td>
+          </tr>
+        <% end %>
+      <% end %>
     </tbody>
   </table>
   <% end %>
