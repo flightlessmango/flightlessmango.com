@@ -63,7 +63,7 @@ class Bench < ApplicationRecord
                           type_id: type_id, fps: parse[fps].to_d, frametime: (1000 / parse[fps].to_f).round(2),
                           cpu: parse[cpu].to_f, gpu: parse[gpu].to_i, color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
             count += 1
-        end
+          end
         end
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
     end
@@ -96,7 +96,29 @@ class Bench < ApplicationRecord
     self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
-          end
+
+  def parse_upload_ocat(game_id, variation_id, type_id, bench_id, color, api_id)
+    require 'csv'
+    parsed = CSV.parse(upload.attachment.download)
+    count = 0
+    frametime = 0
+    time = 0
+    length = parsed.count
+    parsed.each_with_index do |parse, i|
+      if parsed[0][i] == "MsUntilRenderComplete"
+        frametime = i
+      end
+      if parsed[0][i] == "TimeInSeconds"
+        time = i
+      end
+    end
+      parsed.each_with_index do |parse, i|
+        if i > 1
+          Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
+                        type_id: type_id, fps: frametime * 1000, frametime: frametime, cpu: frametime, gpu: frametime,
+                        color: color, pos: time * 1000, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+                        count += 1          
+        end
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
     end
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
@@ -236,6 +258,8 @@ class Bench < ApplicationRecord
     url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + self.youtubeid + "&key=" + ENV["YOUTUBE_KEY"]
     data = JSON.load(open(url))
     self.update(description: data["items"][0]["snippet"]["description"])
+
+    # https://www.googleapis.com/youtube/v3/videos?part=snippet&id=GjuPA6HrFIU&key=AIzaSyA3J4ZAhBMBIHWfoWVBCdr35lbA_CWhVfQ
   end
   
 end
