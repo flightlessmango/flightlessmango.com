@@ -96,14 +96,6 @@ class Bench < ApplicationRecord
     self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
-          end
-        ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
-    end
-    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
-    self.refresh_json
-    self.refresh_json_api
-    ActionCable.server.broadcast 'web_notifications_channel', 100
-  end
   
   def refresh_json
     Input.where(fps: 0).delete_all
