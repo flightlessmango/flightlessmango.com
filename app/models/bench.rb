@@ -49,7 +49,7 @@ class Bench < ApplicationRecord
       if parsed[0][i] == "Framerate           "
         fps = i
       end
-      if parsed[0][i] == "GPU1 usage          "
+      if parsed[0][i] == "GPU1 usage          " || parsed[0][i] == "GPU usage           "
         gpu = i
       end
       if parsed[0][i] == "CPU usage           "
@@ -57,7 +57,7 @@ class Bench < ApplicationRecord
       end
     end
       parsed.each_with_index do |parse, i|
-        unless parse[69] == nil || i == 0
+        unless parse[cpu] == nil || i == 0
           #5.times do 
             Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
                           type_id: type_id, fps: parse[fps].to_d, frametime: (1000 / parse[fps].to_f).round(2),
@@ -83,11 +83,19 @@ class Bench < ApplicationRecord
         #               type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2),
         #               cpu: parse[1].to_f, gpu: plarse[2].to_i, color: color, pos: count)
         # REMOVED CPU/GPU FOR MESA OVERLAY
-        if i > 1
+
           Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
                         type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2), cpu: parse[1], gpu: parse[2],
                         color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
                         count += 1          
+
+        ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
+    end
+    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
+    self.refresh_json
+    self.refresh_json_api
+    ActionCable.server.broadcast 'web_notifications_channel', 100
+  end
           end
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
     end
