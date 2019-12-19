@@ -26,7 +26,8 @@
 </div>
 
 <script>
-  var num = 0;
+  var num = 0; 
+  var xAxisBoolean = false;
   function addCallback(name, chart){
     switch(name){
       case 'fps':
@@ -40,6 +41,7 @@
       break
       case 'bar':
         subtitleText = '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'
+        xAxisBoolean = true;
       break
     }
     var newOptions = {
@@ -50,7 +52,7 @@
         },
         xAxis: {
           labels: {
-            enabled: false
+            enabled: xAxisBoolean
           }
         },
         tooltip: {
