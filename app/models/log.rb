@@ -8,12 +8,13 @@ class Log < ApplicationRecord
   
   def parse_upload
     require 'csv'
+    fps_row = 0
     inputs_fps = []
     inputs_frametime = []
-    maxstring = ",{'data':{"
-    minstring = "{'data':{"
-    avgstring = ",{'data':{"
-    onepercentstring = ",{'data':{"
+    maxstring = ',{"data":{'
+    minstring = '{"data":{'
+    avgstring = ',{"data":{'
+    onepercentstring = ',{"data":{'
     bar_chart = ""
     data_fps = []
     data_fps_only = []
@@ -33,11 +34,37 @@ class Log < ApplicationRecord
           kernel: parsed[1][4], driver: parsed[1][5], log_id: self.id, user_id: self.user_id)
         end
       end
-      parsed.each_with_index do |parse, i|
-        if i > 2
-          data_fps.push([i, parse[0]])
-          data_fps_only.push(parse[0].to_i)
-          data_frametime.push([i, (1000 / parse[0].to_f).round(2)])
+      if upload.filename.extension == "hml"
+        parsed[0].each_with_index do |parse, i|
+          if parse == "Framerate           "
+            fps_row = i
+          end
+          if parse == "Framerate           "
+            fps_row = i
+          end
+        end
+        count = 0
+        parsed.each_with_index do |parse, i|
+          unless parse[fps_row] == nil || parse[fps_row] == "Framerate           "
+            5.times do
+              data_fps.push([count, parse[fps_row]])
+              data_fps_only.push(parse[fps_row].to_i)
+              data_frametime.push([count, (1000 / parse[fps_row].to_f).round(2)])
+              count += 1
+            end
+          end
+
+        end
+        
+      else
+        count = 0
+        parsed.each_with_index do |parse, i|
+          if i > 2
+            data_fps.push([count, parse[0]])
+            data_fps_only.push(parse[0].to_i)
+            data_frametime.push([count, (1000 / parse[0].to_f).round(2)])
+            count += 1
+          end
         end
       end
       fpsSorted = data_fps.map{ |object| object[1]}.sort_by(&:to_i)
@@ -53,26 +80,26 @@ class Log < ApplicationRecord
       allMax.push(data_fps_only.max)
       allMin.push(data_fps_only.min)
       fpsTotal / data_fps.count
-      if i == (uploads.attachments.count - 1)
-        maxstring = maxstring               + "'#{upload.filename.to_s}': #{data_fps_only.max}"
-        minstring = minstring               + "'#{upload.filename.to_s}': #{data_fps_only.min}"
-        onepercentstring = onepercentstring + "'#{upload.filename.to_s}': #{(fpsTotalSorted / onePercent.count).to_s}"
-        avgstring = avgstring               + "'#{upload.filename.to_s}': #{(fpsTotal / data_fps.count).to_s}"
+      if i == (self.uploads.attachments.count - 1)
+        maxstring = maxstring               + '"' + upload.filename.to_s + '"' + ": #{data_fps_only.max}"
+        minstring = minstring               + '"' + upload.filename.to_s + '"' + ": #{data_fps_only.min}"
+        onepercentstring = onepercentstring + '"' + upload.filename.to_s + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s}"
+        avgstring = avgstring               + '"' + upload.filename.to_s + '"' + ": #{(fpsTotal / data_fps.count).to_s}"
       else
-        maxstring = maxstring + "'#{upload.filename.to_s}': #{data_fps_only.max},"
-        minstring = minstring + "'#{upload.filename.to_s}': #{data_fps_only.min},"
-        onepercentstring = onepercentstring + "'#{upload.filename.to_s}': #{(fpsTotalSorted / onePercent.count).to_s},"
-        avgstring = avgstring + "'#{upload.filename.to_s}': #{(fpsTotal / data_fps_only.count).to_s},"
+        maxstring = maxstring               + '"' + upload.filename.to_s + '"' + ": #{data_fps_only.max},"
+        minstring = minstring               + '"' + upload.filename.to_s + '"' + ": #{data_fps_only.min},"
+        onepercentstring = onepercentstring + '"' + upload.filename.to_s + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s},"
+        avgstring = avgstring               + '"' + upload.filename.to_s + '"' + ": #{(fpsTotal / data_fps.count).to_s},"
       end
       
       inputs_fps.push(name: upload.filename.to_s, data: data_fps, color: upload.color)
       inputs_frametime.push(name: upload.filename.to_s, data: data_frametime, color: upload.color)
       upload.update(min: data_fps_only.min, max: data_fps_only.max, avg: fpsTotal / data_fps_only.count, onepercent: fpsTotalSorted / onePercent.count)
       end
-      maxstring = maxstring               + "}, 'name':'Max'}"
-      minstring = minstring               + "}, 'name':'Min'}"
-      avgstring = avgstring               + "}, 'name':'Avg'}"
-      onepercentstring = onepercentstring + "}, 'name':'1% min'}"
+      maxstring = maxstring               + '}, "name":"Max"}'
+      minstring = minstring               + '}, "name":"Min"}'
+      avgstring = avgstring               + '}, "name": "Avg"}'
+      onepercentstring = onepercentstring + '}, "name": "1% min"}'
       bar_chart = "[" + minstring + onepercentstring + avgstring + maxstring  + "]"
       bar_chart = bar_chart.tr("'", '"')
       if self.uploads.count > 1
