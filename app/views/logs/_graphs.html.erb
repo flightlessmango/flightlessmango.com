@@ -10,3 +10,74 @@ library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="
 <% if @log.compare_to != nil %>
   <%= render 'stats' %>
 <% end %>
+
+<script>
+  var num = 0; 
+  var xAxisBoolean = false;
+  var min = 0;
+  function addCallback(name, chart){
+    switch(name){
+      case 'fps':
+        subtitleText = '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better';
+        min = <%= @log.min %>
+      break
+      case 'frametime':
+        subtitleText = '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'
+        min = <%= 1000 / @log.max %>
+      break
+      case 'cpu':
+        subtitleText = "";
+      break
+      case 'bar':
+        subtitleText = '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'
+        xAxisBoolean = true;
+      break
+    }
+    var newOptions = {
+      library: {
+        subtitle: {
+          useHTML: true,
+          text: subtitleText
+        },
+        yAxis: {
+           min: min
+        },
+        xAxis: {
+          labels: {
+            enabled: xAxisBoolean
+          }
+        },
+        tooltip: {
+          formatter: function() {
+              var s = '<b>'+ this.x +'</b>';
+
+              $.each(this.points, function(i, point) {
+                  s += '<br/><span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': ' + Math.round(point.y * 10) / 10;
+              });
+
+              return s;
+          },
+          shared: true
+        },
+        chart: {
+          events: {
+            load: function () {
+              num++
+              if (num == (Object.keys(Chartkick.charts).length * 2)){
+                $('#loadingSpinner').hide()
+                $('#gameContent').removeClass('d-none')
+                $('#gameContent').addClass('animated fadeIn')
+              }
+            }
+          }
+        }
+      }
+    }
+  var mergedOptions = jQuery.extend(chart.options,newOptions)
+  chart.setOptions(mergedOptions);
+  } 
+  $.each(Chartkick.charts, function(name, chart) {
+    addCallback(name, chart);
+  })
+
+</script>
