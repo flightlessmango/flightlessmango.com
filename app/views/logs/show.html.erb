@@ -1,5 +1,7 @@
-<% if current_user.admin? %>
-  <%= link_to @log.uploads.last.filename, rails_blob_path(@log.uploads.last, disposition: 'attachment') %>
+<% if user_signed_in? %>
+  <% if current_user.admin? %>
+    <%= link_to @log.uploads.last.filename, rails_blob_path(@log.uploads.last, disposition: 'attachment') %>
+  <% end %>
 <% end %>
 <% if @log.user == current_user %>
   <%= link_to "Edit Benchmark", edit_game_log_path(@game, @log), class: 'btn btn-warning' %>
