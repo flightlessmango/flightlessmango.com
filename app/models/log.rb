@@ -5,6 +5,10 @@ class Log < ApplicationRecord
   belongs_to :game
   belongs_to :user
   has_one :computer
+
+  def is_float?(fl)
+    !!Float(fl) rescue false
+  end
   
   def parse_upload
     require 'csv'
@@ -35,22 +39,23 @@ class Log < ApplicationRecord
         end
       end
       if upload.filename.extension == "hml"
-        parsed[0].each_with_index do |parse, i|
-          if parse == "Framerate           "
-            fps_row = i
-          end
-          if parse == "Framerate           "
-            fps_row = i
+        parsed.each_with_index do |parse, i|
+          1000.times do |x|
+            if parse[x] == "Framerate           "
+              fps_row = x
+            end
           end
         end
         count = 0
         parsed.each_with_index do |parse, i|
           unless parse[fps_row] == nil || parse[fps_row] == "Framerate           "
             5.times do
-              data_fps.push([count, parse[fps_row]])
-              data_fps_only.push(parse[fps_row].to_i)
-              data_frametime.push([count, (1000 / parse[fps_row].to_f).round(2)])
-              count += 1
+              if is_float?(parse[fps_row])
+                data_fps.push([count, parse[fps_row]])
+                data_fps_only.push(parse[fps_row].to_i)
+                data_frametime.push([count, (1000 / parse[fps_row].to_f).round(2)])
+                count += 1
+              end
             end
           end
 
