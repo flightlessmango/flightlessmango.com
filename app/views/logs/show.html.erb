@@ -1,5 +1,8 @@
 <% if @log.user == current_user %>
   <%= link_to "Edit Benchmark", edit_game_log_path(@game, @log), class: 'btn btn-warning' %>
+  <% if current_user.admin? %>
+    <%= link_to @log.uploads.last.filename, rails_blob_path(@log.uploads.last, disposition: 'attachment') %>
+  <% end %>
   <%= link_to "Remove Benchmark",
               game_log_path(@game, @log),
               :method => :delete,
