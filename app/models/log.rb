@@ -86,19 +86,19 @@ class Log < ApplicationRecord
       allMin.push(data_fps_only.min)
       fpsTotal / data_fps.count
       if i == (self.uploads.attachments.count - 1)
-        maxstring = maxstring               + '"' + upload.filename.to_s + '"' + ": #{data_fps_only.max}"
-        minstring = minstring               + '"' + upload.filename.to_s + '"' + ": #{data_fps_only.min}"
-        onepercentstring = onepercentstring + '"' + upload.filename.to_s + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s}"
-        avgstring = avgstring               + '"' + upload.filename.to_s + '"' + ": #{(fpsTotal / data_fps.count).to_s}"
+        maxstring = maxstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.max}"
+        minstring = minstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.min}"
+        onepercentstring = onepercentstring + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s}"
+        avgstring = avgstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotal / data_fps.count).to_s}"
       else
-        maxstring = maxstring               + '"' + upload.filename.to_s + '"' + ": #{data_fps_only.max},"
-        minstring = minstring               + '"' + upload.filename.to_s + '"' + ": #{data_fps_only.min},"
-        onepercentstring = onepercentstring + '"' + upload.filename.to_s + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s},"
-        avgstring = avgstring               + '"' + upload.filename.to_s + '"' + ": #{(fpsTotal / data_fps.count).to_s},"
+        maxstring = maxstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.max},"
+        minstring = minstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.min},"
+        onepercentstring = onepercentstring + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s},"
+        avgstring = avgstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotal / data_fps.count).to_s},"
       end
       
-      inputs_fps.push(name: upload.filename.to_s, data: data_fps, color: upload.color)
-      inputs_frametime.push(name: upload.filename.to_s, data: data_frametime, color: upload.color)
+      inputs_fps.push(name: upload.filename.to_s.chomp(upload.filename.extension).chomp("."), data: data_fps, color: upload.color)
+      inputs_frametime.push(name: upload.filename.to_s.chomp(upload.filename.extension).chomp("."), data: data_frametime, color: upload.color)
       upload.update(min: data_fps_only.min, max: data_fps_only.max, avg: fpsTotal / data_fps_only.count, onepercent: fpsTotalSorted / onePercent.count)
       end
       maxstring = maxstring               + '}, "name":"Max"}'

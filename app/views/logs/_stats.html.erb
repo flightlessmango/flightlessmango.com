@@ -16,7 +16,7 @@
      <tbody style="color: white;">
        <% @log.uploads.order(:id).each do |upload| %>
         <tr>
-            <td><%= upload.blob.filename %></td>
+            <td><%= upload.blob.filename.to_s.chomp(upload.filename.extension).chomp(".") %></td>
             <td><%= upload.min.to_i %></td>
             <td><%= upload.onepercent.to_i %></td>
             <td><%= upload.max.to_i %></td>
