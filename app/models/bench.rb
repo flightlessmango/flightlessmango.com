@@ -25,7 +25,11 @@ class Bench < ApplicationRecord
 
   def self.refresh
     Bench.all.each do |bench|
-      bench.refresh_json
+      if bench.apis.count > 1
+        bench.refresh_json_api
+      else
+        bench.refresh_json
+      end
     end
   end
   
@@ -171,16 +175,14 @@ class Bench < ApplicationRecord
       full_fps_chart = apis_bench.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).group(:pos).average(:fps), color: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).last.color}}.chart_json
       full_frametime_chart = apis_bench.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).group(:pos).average(:frametime), color: type.inputs.where(apis_bench_id: apis_bench.id).where(bench_id: self.id).last.color}}.chart_json
       onepercent = {}
+      percentile97 = {}
       apis_bench.types.each do |type|
         typeInputs = type.inputs.where(bench_id: self.id)
         pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id)
         onepercent.store(type.name, typeInputs.where(id: pluck).average(:fps))
+        percentile97.store(type.name, Bench.percentile(typeInputs.pluck(:fps).sort, 0.97))
       end
       bar_chart = [
-              {
-                name: 'Min',
-                data: apis_bench.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').minimum(:fps),
-              },
               {
                 name: '1% Min',
                 data: onepercent
@@ -190,9 +192,9 @@ class Bench < ApplicationRecord
                 data: apis_bench.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').average(:fps),
               },
               {
-                name: 'Max',
-                data: apis_bench.inputs.where(bench_id: self.id).joins(:type).group('types.name').order('types.name ASC').maximum(:fps),
-              },
+                name: '97th percentile',
+                data: percentile97
+              }
             ]
       apis_bench.update(fps: fps_chart, frametime: frametime_chart, full_fps: full_fps_chart, full_frametime: full_frametime_chart, bar: bar_chart)
     end
