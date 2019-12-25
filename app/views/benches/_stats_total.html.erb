@@ -32,7 +32,7 @@
        <% pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id) %>
        <% onepercent = typeInputs.where(id: pluck).average(:fps) %>
         <tr>
-          <td style="background-color: <%= type.inputs.last.color%>; width: 5%;"></td>
+          <td style="background-color: <%= typeInputs.last.color%>; width: 5%;"></td>
           <td><%= type %></td>
           <td><%= onepercent.to_i %></td>
           <td><%= type.inputs.where(bench_id: @benchmark.id).average(:fps).to_i %></td>
