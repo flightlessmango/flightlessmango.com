@@ -15,6 +15,14 @@ class Bench < ApplicationRecord
      '#800000', '#aaffc3', '#808000', '#000075', '#808080' ]
   FILETYPES = ["MANGO", "HML"]
   
+  def self.percentile(values, percentile)
+    values_sorted = values.sort
+    k = (percentile*(values_sorted.length-1)+1).floor - 1
+    f = (percentile*(values_sorted.length-1)+1).modulo(1)
+
+    return values_sorted[k] + (f * (values_sorted[k+1] - values_sorted[k]))
+  end
+
   def self.refresh
     Bench.all.each do |bench|
       bench.refresh_json
@@ -100,8 +108,9 @@ class Bench < ApplicationRecord
   def refresh_json
     Input.where(fps: 0).delete_all
     onepercent = {}
+    percentile97 = {}
     self.games.each do |game|
-
+      
       benches_game = BenchesGame.where(game_id: game.id, bench_id: self.id).last
       fps_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 5 == 0 }.compact.pluck(:id)).group(:pos).average(:fps), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
       frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 5 == 0 }.compact.pluck(:id)).group(:pos).average(:frametime), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
@@ -114,12 +123,9 @@ class Bench < ApplicationRecord
         typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
         pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id)
         onepercent.store(type.name, typeInputs.where(id: pluck).average(:fps))
+        percentile97.store(type.name, Bench.percentile(typeInputs.pluck(:fps).sort, 0.97))
       end
       bar_chart = [
-              {
-                name: 'Min',
-                data: benches_game.inputs.joins(:type).group('types.name').order('types.name ASC').minimum(:fps),
-              },
               {
                 name: '1% Min',
                 data: onepercent
@@ -129,8 +135,8 @@ class Bench < ApplicationRecord
                 data: benches_game.inputs.joins(:type).group('types.name').order('types.name ASC').average(:fps),
               },
               {
-                name: 'Max',
-                data: benches_game.inputs.joins(:type).group('types.name').order('types.name ASC').maximum(:fps),
+                name: '97th percentile',
+                data: percentile97
               },
 
 

@@ -3,10 +3,9 @@
     <tr>
         <th>Color</th>
         <th>Name</th>
-        <th class="d-none d-sm-block">Min</th>
         <th>1% Min</th>
         <th>Avg</th>
-        <th class="d-none d-sm-block">Max</th>
+        <th>97th percentile</th>
         <% if types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').any? %>
           <th>Avg % vs Windows DX12</th>
         <% end %>
@@ -35,10 +34,9 @@
         <tr>
           <td style="background-color: <%= type.inputs.last.color%>; width: 5%;"></td>
           <td><%= type %></td>
-          <td class="d-none d-sm-block"><%= type.inputs.where(bench_id: @benchmark.id).minimum(:fps).to_i %></td>
           <td><%= onepercent.to_i %></td>
           <td><%= type.inputs.where(bench_id: @benchmark.id).average(:fps).to_i %></td>
-          <td class="d-none d-sm-block"><%= type.inputs.where(bench_id: @benchmark.id).maximum(:fps).to_i %></td>
+          <td><%= Bench.percentile(typeInputs.pluck(:fps).sort, 0.97).round(0) %></td>
           <td>
             <% if types.where(name: 'Windows DX12').any? && types.where(name: 'Windows DX11').any? %>
               <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / @benchmark.types.where(name: 'Windows DX12').last.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%

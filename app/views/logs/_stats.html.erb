@@ -3,10 +3,11 @@
     <tr>
         <th>Color</th>
         <th>Name</th>
-        <th>Min</th>
+        <!-- <th>Min</th> -->
         <th>1% Min</th>
-        <th>Max</th>
+        <!-- <th>Max</th> -->
         <th>Avg</th>
+        <th>97th percentile</th>
         <% if @log.uploads.blobs.where(id: @log.compare_to).any? %>
           <th>Avg % vs <%= @log.uploads.blobs.where(id: @log.compare_to).first.filename %></th>
         <% else %>
@@ -19,10 +20,11 @@
         <tr>
             <td style="background-color: <%= upload.color%>; width: 5%;"></td>
             <td><%= upload.blob.filename.to_s.chomp(upload.filename.extension).chomp(".") %></td>
-            <td><%= upload.min.to_i %></td>
+            <!-- <td><%#= upload.min.to_i %></td> -->
             <td><%= upload.onepercent.to_i %></td>
-            <td><%= upload.max.to_i %></td>
+            <!-- <td><%#= upload.max.to_i %></td> -->
             <td><%= upload.avg.to_i %></td>
+            <td><%= upload.percentile97 %></td>
             <td>
               <% if @log.uploads.blobs.where(id: @log.compare_to).any? %>
                 <%= (upload.avg / @log.uploads.blobs.where(id: @log.compare_to).first.attachments.first.avg * 100).round(2)%>

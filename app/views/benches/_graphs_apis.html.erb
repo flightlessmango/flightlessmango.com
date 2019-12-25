@@ -27,7 +27,7 @@
        points: false, curve: false, download: true, title: 'Frame Time', id: 'frametime', xtitle: "Time", ytitle: "Ms",
         library: {yAxis: {min: @benchmark.inputs.minimum(:frametime)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px'  %>
     <br>
-    <%= bar_chart bar_apis_bench_path(apis_bench), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Average', id: 'bar', ytitle: "FPS",
+    <%= bar_chart bar_apis_bench_path(apis_bench), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Average', id: 'bar', ytitle: "FPS",
      library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px' %> 
     <%= render partial: 'benches/stats_api', locals: {types: ApisBench.where(bench_id: @benchmark.id, api_id: @benchmark.apis.order(name: :asc).first.id).first.types, apis_bench_id: ApisBench.where(bench_id: @benchmark.id, api_id: @benchmark.apis.order(name: :asc).first.id).first.id} %>
     <%#= render 'spidergraph' %>

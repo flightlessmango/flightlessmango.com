@@ -18,7 +18,7 @@
         points: false, curve: false, download: true, title: 'FPS',
         xtitle: "Time", ytitle: "FPS", height: '400px', min: benches_game.min %>
     </div>
-    <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#ebc71d", "#6639b6", "#3398dc"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
+    <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
     library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
 
     <div id="gameStats">

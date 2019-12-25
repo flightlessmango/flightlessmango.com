@@ -18,7 +18,8 @@ class Log < ApplicationRecord
     maxstring = ',{"data":{'
     minstring = '{"data":{'
     avgstring = ',{"data":{'
-    onepercentstring = ',{"data":{'
+    onepercentstring = '{"data":{'
+    percentile97 = ',{"data":{'
     bar_chart = ""
     data_fps = []
     data_fps_only = []
@@ -86,26 +87,30 @@ class Log < ApplicationRecord
       allMin.push(data_fps_only.min)
       fpsTotal / data_fps.count
       if i == (self.uploads.attachments.count - 1)
-        maxstring = maxstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.max}"
-        minstring = minstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.min}"
+        # maxstring = maxstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.max}"
+        # minstring = minstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.min}"
+        percentile97 = percentile97         + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)}"
         onepercentstring = onepercentstring + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s}"
         avgstring = avgstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotal / data_fps.count).to_s}"
       else
-        maxstring = maxstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.max},"
-        minstring = minstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.min},"
+        # maxstring = maxstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.max},"
+        # minstring = minstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.min},"
+        percentile97 = percentile97         + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)},"
         onepercentstring = onepercentstring + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s},"
         avgstring = avgstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotal / data_fps.count).to_s},"
       end
       
       inputs_fps.push(name: upload.filename.to_s.chomp(upload.filename.extension).chomp("."), data: data_fps, color: upload.color)
       inputs_frametime.push(name: upload.filename.to_s.chomp(upload.filename.extension).chomp("."), data: data_frametime, color: upload.color)
-      upload.update(min: data_fps_only.min, max: data_fps_only.max, avg: fpsTotal / data_fps_only.count, onepercent: fpsTotalSorted / onePercent.count)
+      upload.update(min: data_fps_only.min, max: data_fps_only.max, avg: fpsTotal / data_fps_only.count, onepercent: fpsTotalSorted / onePercent.count,
+                    percentile97: Bench.percentile(data_fps_only.sort, 0.97))
       end
       maxstring = maxstring               + '}, "name":"Max"}'
       minstring = minstring               + '}, "name":"Min"}'
       avgstring = avgstring               + '}, "name": "Avg"}'
       onepercentstring = onepercentstring + '}, "name": "1% min"}'
-      bar_chart = "[" + minstring + onepercentstring + avgstring + maxstring  + "]"
+      percentile97 = percentile97         + '}, "name": "97th percentile"}'
+      bar_chart = "[" + onepercentstring + avgstring + percentile97  + "]"
       bar_chart = bar_chart.tr("'", '"')
       if self.uploads.count > 1
         if self.compare_to == nil
