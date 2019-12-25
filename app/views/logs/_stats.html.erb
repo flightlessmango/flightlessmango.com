@@ -1,6 +1,7 @@
 <table class="table table-bordered" id="stats-table">
  <thead class="thead-dark">
     <tr>
+        <th>Color</th>
         <th>Name</th>
         <th>Min</th>
         <th>1% Min</th>
@@ -16,6 +17,7 @@
      <tbody style="color: white;">
        <% @log.uploads.order(:id).each do |upload| %>
         <tr>
+            <td style="background-color: <%= upload.color%>; width: 5%;"></td>
             <td><%= upload.blob.filename.to_s.chomp(upload.filename.extension).chomp(".") %></td>
             <td><%= upload.min.to_i %></td>
             <td><%= upload.onepercent.to_i %></td>
