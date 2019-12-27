@@ -13,7 +13,7 @@ class Bench < ApplicationRecord
   COLORSRGB =  ["rgba(51,152,220,1)", "rgba(102,57,182,1)", "rgba(230,75,59,1)", "rgba(114,192,44,1)", "rgba(235,199,29,1)"]
   TWENTY    =  [ '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8',
      '#800000', '#aaffc3', '#808000', '#000075', '#808080' ]
-  FILETYPES = ["MANGO", "HML"]
+  FILETYPES = ["MANGO", "OCAT", "HML"]
   
   def self.percentile(values, percentile)
     values_sorted = values.sort
@@ -95,11 +95,41 @@ class Bench < ApplicationRecord
         #               type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2),
         #               cpu: parse[1].to_f, gpu: plarse[2].to_i, color: color, pos: count)
         # REMOVED CPU/GPU FOR MESA OVERLAY
-        5.times do 
           Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
                         type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2), cpu: parse[1], gpu: parse[2],
                         color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
                         count += 1          
+        ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
+    end
+    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
+    self.refresh_json
+    self.refresh_json_api
+    ActionCable.server.broadcast 'web_notifications_channel', 100
+  end
+
+  def parse_upload_ocat(game_id, variation_id, type_id, bench_id, color, api_id)
+    require 'csv'
+    parsed = CSV.parse(upload.attachment.download)
+    length = parsed.count
+    count = 0
+    frametime = 0
+    time_col = 0
+    parsed.each_with_index do |parse, i|
+      if parsed[0][i] == "MsBetweenPresents"
+        frametime = i
+      end
+      if parsed[0][i] == "TimeInSeconds"
+        time_col = i
+      end
+    end
+      parsed.each_with_index do |parse, i|
+        unless i == 0
+
+            Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
+                          type_id: type_id, fps: 1000 / parse[frametime].to_f.round(2), frametime: parse[frametime].to_d,
+                          color: color, pos: parse[time_col].gsub(".", "").to_i, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+            count += 1
+
         end
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
     end
