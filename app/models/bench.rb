@@ -70,12 +70,12 @@ class Bench < ApplicationRecord
     end
       parsed.each_with_index do |parse, i|
         unless parse[cpu] == nil || i == 0
-          5.times do 
+          # 5.times do 
             Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
                           type_id: type_id, fps: parse[fps].to_d, frametime: (1000 / parse[fps].to_f).round(2),
                           cpu: parse[cpu].to_f, gpu: parse[gpu].to_i, color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
             count += 1
-        end
+          # end
         end
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
     end
