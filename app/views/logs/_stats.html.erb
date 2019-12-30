@@ -19,7 +19,7 @@
        <% @log.uploads.order(:id).each do |upload| %>
         <tr>
             <td style="background-color: <%= upload.color%>; width: 5%;"></td>
-            <td><%= upload.blob.filename.to_s.chomp(upload.filename.extension).chomp(".") %></td>
+            <td><%= upload.display_name %></td>
             <!-- <td><%#= upload.min.to_i %></td> -->
             <td><%= upload.onepercent.to_i %></td>
             <!-- <td><%#= upload.max.to_i %></td> -->

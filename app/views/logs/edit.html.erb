@@ -23,13 +23,14 @@
             </div>
           </div>
         </td>
-        <td><input class="form-control text-center" id="<%= "blob_" + upload.blob.id.to_s + "_filename"%>" value="<%= upload.blob.filename %>"> </td>
+        <td><input class="form-control text-center" id="<%= "blob_" + upload.blob.id.to_s + "_filename"%>" value="<%= upload.display_name %>"> </td>
         <script type="text/javascript">
           var timeoutBlob_<%= upload.blob.id.to_s %>
           function updateFilename_<%= upload.blob.id.to_s %>(){
-            $.get( "<%= update_blob_filename_game_log_path(@game) %>" + "?blob_id=" + <%= upload.blob_id.to_s %> + "&filename=" +  $('#blob_<%= upload.blob.id.to_s %>_filename').val(), function( data ) {
+            $.get( "<%= update_attachment_name_game_log_path(@game, @log) %>" + "?attachment_id=" + <%= upload.id.to_s %> + "&name=" +  $('#blob_<%= upload.blob.id.to_s %>_filename').val(), function( data ) {
             });
           }
+
 
             var first = true;
             $("#colorPick_<%= upload.blob.id %>").colorPick({

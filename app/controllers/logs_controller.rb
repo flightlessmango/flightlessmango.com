@@ -93,10 +93,18 @@ def edit_benchmark
   @game = @log.game
 end
 
-def update_blob_filename
-  @log = ActiveStorage::Blob.find(params[:blob_id]).attachments.first.record
+# def update_blob_filename
+#   @log = ActiveStorage::Blob.find(params[:blob_id]).attachments.first.record
+#   if @log.user == current_user
+#     ActiveStorage::Blob.find(params[:blob_id]).update(filename: params[:filename])
+#     @log.parse_upload
+#   end
+# end
+
+def update_attachment_name
+  @log = ActiveStorage::Attachment.find(params[:attachment_id]).record
   if @log.user == current_user
-    ActiveStorage::Blob.find(params[:blob_id]).update(filename: params[:filename])
+    ActiveStorage::Attachment.find(params[:attachment_id]).update(display_name: params[:name].to_s)
     @log.parse_upload
   end
 end

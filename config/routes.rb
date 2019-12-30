@@ -45,6 +45,7 @@ Rails.application.routes.draw do
         get 'bar'
         get 'update_blob_filename'
         get 'update_attachment_color'
+        get 'update_attachment_name'
       end
     end
   end

@@ -26,6 +26,7 @@ class Log < ApplicationRecord
     allMax = []
     allMin = []
     uploads.attachments.each_with_index do |upload, i|
+      upload.update(display_name: upload.filename.to_s) if upload.display_name.nil?
       if upload.color == nil 
         upload.update(color: Bench::TWENTY[i])
       end
@@ -87,21 +88,21 @@ class Log < ApplicationRecord
       allMin.push(data_fps_only.min)
       fpsTotal / data_fps.count
       if i == (self.uploads.attachments.count - 1)
-        # maxstring = maxstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.max}"
-        # minstring = minstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.min}"
-        percentile97 = percentile97         + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)}"
-        onepercentstring = onepercentstring + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s}"
-        avgstring = avgstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotal / data_fps.count).to_s}"
+        # maxstring = maxstring               + '"' + display_name + '"' + ": #{data_fps_only.max}"
+        # minstring = minstring               + '"' + display_name + '"' + ": #{data_fps_only.min}"
+        percentile97 = percentile97         + '"' + upload.display_name + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)}"
+        onepercentstring = onepercentstring + '"' + upload.display_name + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s}"
+        avgstring = avgstring               + '"' + upload.display_name + '"' + ": #{(fpsTotal / data_fps.count).to_s}"
       else
-        # maxstring = maxstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.max},"
-        # minstring = minstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{data_fps_only.min},"
-        percentile97 = percentile97         + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)},"
-        onepercentstring = onepercentstring + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s},"
-        avgstring = avgstring               + '"' + upload.filename.to_s.chomp(upload.filename.extension).chomp(".") + '"' + ": #{(fpsTotal / data_fps.count).to_s},"
+        # maxstring = maxstring               + '"' + display_name + '"' + ": #{data_fps_only.max},"
+        # minstring = minstring               + '"' + display_name + '"' + ": #{data_fps_only.min},"
+        percentile97 = percentile97         + '"' + upload.display_name + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)},"
+        onepercentstring = onepercentstring + '"' + upload.display_name + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s},"
+        avgstring = avgstring               + '"' + upload.display_name + '"' + ": #{(fpsTotal / data_fps.count).to_s},"
       end
       
-      inputs_fps.push(name: upload.filename.to_s.chomp(upload.filename.extension).chomp("."), data: data_fps, color: upload.color)
-      inputs_frametime.push(name: upload.filename.to_s.chomp(upload.filename.extension).chomp("."), data: data_frametime, color: upload.color)
+      inputs_fps.push(name: upload.display_name, data: data_fps, color: upload.color)
+      inputs_frametime.push(name: upload.display_name, data: data_frametime, color: upload.color)
       upload.update(min: data_fps_only.min, max: data_fps_only.max, avg: fpsTotal / data_fps_only.count, onepercent: fpsTotalSorted / onePercent.count,
                     percentile97: Bench.percentile(data_fps_only.sort, 0.97))
       end
