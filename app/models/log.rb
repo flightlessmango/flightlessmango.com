@@ -51,14 +51,14 @@ class Log < ApplicationRecord
         count = 0
         parsed.each_with_index do |parse, i|
           unless parse[fps_row] == nil || parse[fps_row] == "Framerate           "
-            5.times do
+            # 5.times do
               if is_float?(parse[fps_row])
                 data_fps.push([count, parse[fps_row]])
                 data_fps_only.push(parse[fps_row].to_i)
                 data_frametime.push([count, (1000 / parse[fps_row].to_f).round(2)])
                 count += 1
               end
-            end
+            # end
           end
 
         end
