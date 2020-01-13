@@ -7,7 +7,9 @@
 </style>
 <h1 class="text-center"><%= @benchmark.name %></h1>
 <h3 class="text-center">Total</h3><br>
-<%= bar_chart totalbar_bench_path(@benchmark), colors: ["#3398dc", "#6639b6", "#e64b3b", "#ebc71d"], title: 'Average', id: 'bar', ytitle: "FPS", library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px' %> 
+<%= bar_chart totalbar_bench_path(@benchmark), colors: Bench::TWENTY, title: 'Average', ytitle: "FPS",
+library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'},
+plotOptions: { series: { grouping: false}, column: { colorByPoint: true }}, xAxis: {visible: true }, tooltip: { headerFormat: ""}}, height: '500px', stacked: false %>
 <%= render partial: 'benches/stats_total', locals: {types: BenchesGame.where(bench_id: @benchmark.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id).first.id} %>
 <button id="hide" onclick="hide()">Hide</button> 
 <script type="text/javascript">
