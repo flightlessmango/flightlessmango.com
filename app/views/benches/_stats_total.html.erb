@@ -24,8 +24,8 @@
         <% if types.where(name: 'v0.50').any? %>
           <th>Avg % vs v0.50</th>
         <% end %>
-        <% if @types.where(name: 'vKbasalt: off').any? %>
-          <th>Avg % vs vKbasalt: off</th>
+        <% if @types.where(name: 'vkBasalt: off').any? %>
+          <th>Avg % vs vkBasalt: off</th>
         <% end %>
     </tr>
  </thead>
@@ -59,8 +59,8 @@
             <% if types.where(name: 'v0.50').any? %>
               <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / @benchmark.types.where(name: 'v0.50').last.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%
             <% end %>
-            <% if @types.where(name: 'vKbasalt: off').any? %>
-              <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / @benchmark.types.where(name: 'vKbasalt: off').last.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%
+            <% if @types.where(name: 'vkBasalt: off').any? %>
+              <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / @benchmark.types.where(name: 'vkBasalt: off').last.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%
             <% end %>
           </td>
         </tr>
