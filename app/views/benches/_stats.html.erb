@@ -32,6 +32,10 @@
         <% if @types.where(name: 'Windows Vulkan').any? %>
           <th>Avg % vs Windows Vulkan</th>
         <% end %>
+        <% if @types.where(name: 'vKbasalt: off').any? %>
+          <th>Avg % vs vKbasalt: off</th>
+        <% end %>
+
     </tr>
  </thead>
      <tbody style="color: white;">
@@ -71,6 +75,9 @@
             <% end %>
             <% if @types.where(name: 'Windows Vulkan').any? %>
               <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows Vulkan').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+            <% end %>
+            <% if @types.where(name: 'vKbasalt: off').any? %>
+              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'vKbasalt: off').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
             <% end %>
           </td>
         </tr>
