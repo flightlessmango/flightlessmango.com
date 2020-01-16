@@ -35,6 +35,9 @@
         <% if @types.where(name: 'vkBasalt: off').any? %>
           <th>Avg % vs vkBasalt: off</th>
         <% end %>
+        <% if @types.where(name: 'Windows 10').any? %>
+          <th>Avg % vs Windows 10</th>
+        <% end %>
 
     </tr>
  </thead>
@@ -78,6 +81,9 @@
             <% end %>
             <% if @types.where(name: 'vkBasalt: off').any? %>
               <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'vkBasalt: off').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+            <% end %>
+            <% if @types.where(name: 'Windows 10').any? %>
+              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows 10').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
             <% end %>
           </td>
         </tr>
