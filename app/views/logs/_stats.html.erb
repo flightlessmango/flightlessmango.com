@@ -9,7 +9,7 @@
         <th>Avg</th>
         <th>97th percentile</th>
         <% if @log.uploads.blobs.where(id: @log.compare_to).any? %>
-          <th>Avg % vs <%= @log.uploads.blobs.where(id: @log.compare_to).first.filename %></th>
+          <th>Avg % vs <%= @log.uploads.where(blob_id: @log.compare_to).first.display_name %></th>
         <% else %>
           <th>Avg % vs <%= @log.uploads.blobs.first.filename %></th>
         <% end %>
