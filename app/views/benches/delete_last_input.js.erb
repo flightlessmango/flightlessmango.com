@@ -1,0 +1,1 @@
+$("#input_table").load(location.href + " #input_table");

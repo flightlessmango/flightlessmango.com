@@ -100,7 +100,20 @@ end
       format.js
     end
   end
+
+  def refresh
+    @benchmark = Bench.friendly.find(params[:id])
+    @benchmark.refresh_json
+  end
   
+  def delete_last_input
+    @benchmark = Bench.friendly.find(params[:id])
+    @benchmark.inputs.where(benches_game_id: params[:benches_game_id], type_id: params[:type]).last.delete
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def totalbar
     @benchmark = Bench.friendly.find(params[:id])
     render json: @benchmark.totalbar

@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       get 'totalbar'
       get 'total_cpu'
       get 'publish'
+      get 'refresh'
     end
   end
   resources :benches_games do
