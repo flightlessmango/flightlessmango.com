@@ -64,6 +64,11 @@ end
     render json: @benches_game.cpu
   end
   
+  def avgcpu
+    @benches_game = BenchesGame.find(params[:id])
+    render json: @benches_game.avgcpu
+  end
+
   private
   # Never trust parameters from the scary internet, only allow the white list through.
   def benches_game_params

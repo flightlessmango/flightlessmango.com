@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       get 'video_bar'
       get 'video_total'
       get 'delete_inputs'
+      get 'delete_last_input'
       get 'totalbar'
       get 'total_cpu'
       get 'publish'
