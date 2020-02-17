@@ -20,7 +20,7 @@
         <% if @types.where(name: 'stock-CFS').any? %>
           <th>Avg % vs stock-CFS</th>
         <% end %>
-        <% if @types.where(name: 'CFS').any? %>
+        <% if @types.where(name: 'CFS').any? && @types.where(name: 'Windows 10').empty? %>
           <th>Avg % vs CFS</th>
         <% end %>
         <% if @types.where(name: 'v0.50').any? %>
@@ -35,8 +35,11 @@
         <% if @types.where(name: 'vkBasalt: off').any? %>
           <th>Avg % vs vkBasalt: off</th>
         <% end %>
-        <% if @types.where(name: 'Windows 10').any? %>
+        <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').empty? %>
           <th>Avg % vs Windows 10</th>
+        <% end %>
+        <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').any? %>
+          <th>Avg % vs CFS</th>
         <% end %>
 
     </tr>
@@ -67,7 +70,7 @@
             <% if @types.where(name: 'stock-CFS').any? %>
               <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'stock-CFS').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
             <% end %>
-            <% if @types.where(name: 'CFS').any? %>
+            <% if @types.where(name: 'CFS').any? && @types.where(name: 'Windows 10').empty? %>
               <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'CFS').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
             <% end %>
             <% if @types.where(name: 'v0.50').any? %>
@@ -82,8 +85,11 @@
             <% if @types.where(name: 'vkBasalt: off').any? %>
               <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'vkBasalt: off').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
             <% end %>
-            <% if @types.where(name: 'Windows 10').any? %>
+            <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').empty? %>
               <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows 10').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
+            <% end %>
+            <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').any? %>
+              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'CFS').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
             <% end %>
           </td>
         </tr>
