@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_30_121705) do
+ActiveRecord::Schema.define(version: 2020_03_12_154424) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_121705) do
     t.jsonb "totalbar"
     t.text "description"
     t.jsonb "totalcpu"
+    t.integer "compare_to"
     t.index ["slug"], name: "index_benches_on_slug", unique: true
   end
 

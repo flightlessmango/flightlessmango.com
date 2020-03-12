@@ -6,32 +6,37 @@
         <th>1% Min</th>
         <th>Avg</th>
         <th>97th percentile</th>
-        <% if types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').any? %>
-          <th>Avg % vs Windows DX12</th>
-        <% end %>
-        <% if types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').empty? %>
-          <th>Avg % vs Windows DX12</th>
-        <% end %>
-        <% if types.where(name: 'Windows DX11').any?  && @types.where(name: 'Windows DX12').empty? %>
-          <th>Avg % vs Windows DX11</th>
-        <% end %>
-        <% if types.where(name: 'stock-CFS').any? %>
-          <th>Avg % vs stock-CFS</th>
-        <% end %>
-        <% if @types.where(name: 'CFS').any? && @types.where(name: 'Windows 10').empty? %>
-          <th>Avg % vs CFS</th>
-        <% end %>
-        <% if types.where(name: 'v0.50').any? %>
-          <th>Avg % vs v0.50</th>
-        <% end %>
-        <% if @types.where(name: 'vkBasalt: off').any? %>
-          <th>Avg % vs vkBasalt: off</th>
-        <% end %>
-        <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').empty? %>
-          <th>Avg % vs Windows 10</th>
-        <% end %>
-        <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').any? %>
-          <th>Avg % vs CFS</th>
+        <% if @benchmark.compare_to == nil%> 
+          <% if types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').any? %>
+            <th>Avg % vs Windows DX12</th>
+          <% end %>
+          <% if types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').empty? %>
+            <th>Avg % vs Windows DX12</th>
+          <% end %>
+          <% if types.where(name: 'Windows DX11').any?  && @types.where(name: 'Windows DX12').empty? %>
+            <th>Avg % vs Windows DX11</th>
+          <% end %>
+          <% if types.where(name: 'stock-CFS').any? %>
+            <th>Avg % vs stock-CFS</th>
+          <% end %>
+          <% if @types.where(name: 'CFS').any? && @types.where(name: 'Windows 10').empty? %>
+            <th>Avg % vs CFS</th>
+          <% end %>
+          <% if types.where(name: 'v0.50').any? %>
+            <th>Avg % vs v0.50</th>
+          <% end %>
+          <% if @types.where(name: 'vkBasalt: off').any? %>
+            <th>Avg % vs vkBasalt: off</th>
+          <% end %>
+          <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').empty? %>
+            <th>Avg % vs Windows 10</th>
+          <% end %>
+          <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').any? %>
+            <th>Avg % vs CFS</th>
+          <% end %>
+        <% else %>
+          <% compare = Type.find(@benchmark.compare_to) %>
+          <th> Avg % vs <%= compare.name %>
         <% end %>
     </tr>
  </thead>
@@ -47,6 +52,7 @@
           <td><%= type.inputs.where(bench_id: @benchmark.id).average(:fps).to_i %></td>
           <td><%= Bench.percentile(typeInputs.pluck(:fps).sort, 0.97).round(0) %></td>
           <td>
+          <% if @benchmark.compare_to == nil%> 
             <% if types.where(name: 'Windows DX12').any? && types.where(name: 'Windows DX11').any? %>
               <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / @benchmark.types.where(name: 'Windows DX12').last.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%
             <% end %>
@@ -74,6 +80,9 @@
             <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').any? %>
               <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / @benchmark.types.where(name: 'CFS').last.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%
             <% end %>
+          <% else %>
+            <%= (type.inputs.where(bench_id: @benchmark.id).average(:fps) / compare.inputs.where(bench_id: @benchmark.id).average(:fps) * 100).round(2) %>%
+          <% end %>
           </td>
         </tr>
        <% end %>
