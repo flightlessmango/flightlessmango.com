@@ -48,6 +48,10 @@
       <% end %>
     </div>
 </div>
-  <%= render 'graphs' %>
+  <% if @log.max == nil || @log.min == nil %>
+    Log file(s) didn't parse correctly
+  <% else %>
+    <%= render 'graphs' %>
+  <% end %>
 </div>
 <% end %>
