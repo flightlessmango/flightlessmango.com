@@ -67,6 +67,9 @@ class BenchesController < ApplicationController
         if params[:file_type] == "MANGO"
           @benchmark.parse_upload_mango(params[:game_id], params[:variation_id], params[:type_id], @benchmark.id, params[:color], params[:api_id])
         end
+        if params[:file_type] == "OCAT"
+          @benchmark.parse_upload_ocat(params[:game_id], params[:variation_id], params[:type_id], @benchmark.id, params[:color], params[:api_id])
+        end
       end
     else
       format.html { render :edit, flash: {warning: 'Failed to upload'} }
