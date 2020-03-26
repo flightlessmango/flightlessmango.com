@@ -120,6 +120,7 @@ class Bench < ApplicationRecord
     count = 0
     frametime = 0
     time_col = 0
+    last_frame = 2
     parsed.each_with_index do |parse, i|
       if parsed[0][i] == "MsBetweenPresents"
         frametime = i
@@ -130,11 +131,13 @@ class Bench < ApplicationRecord
     end
       parsed.each_with_index do |parse, i|
         unless i == 0
-
+          if parsed[last_frame][time_col].to_f + 0.096 <= parse[time_col].to_f
+            last_frame = i
             Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
-                          type_id: type_id, fps: 1000 / parse[frametime].to_f.round(2), frametime: parse[frametime].to_d,
-                          color: color, pos: parse[time_col].gsub(".", "").to_i, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+                          type_id: type_id, fps: 1000 / parse[frametime].to_f, frametime: parse[frametime].to_d,
+                          color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
             count += 1
+          end
 
         end
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
