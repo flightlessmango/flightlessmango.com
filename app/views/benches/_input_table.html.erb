@@ -24,6 +24,7 @@
             <td><%= inputs.average(:fps).to_i %></td>
             <td><%= inputs.count %></td>
             <td><%= link_to 'Destroy All', delete_inputs_bench_path(@benchmark, :type => type.id, :benches_game_id => BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).last.id), class: 'btn btn-danger', remote: true %>
+            <%= link_to 'Destroy First', delete_first_input_bench_path(@benchmark, :type => type.id, :benches_game_id => BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).last.id), class: 'btn btn-info', remote: true %>
             <%= link_to 'Destroy Last', delete_last_input_bench_path(@benchmark, :type => type.id, :benches_game_id => BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).last.id), class: 'btn btn-warning', remote: true %></td>
           </tr>
         <% end %>
