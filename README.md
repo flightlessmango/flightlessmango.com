@@ -1,24 +1,16 @@
-# README
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+# Deploy
+- `git clone https://github.com/flightlessmango/flightlessmango.com && cd flightlessmango.com`
+- install rvm `\curl -sSL https://get.rvm.io | bash`
+- install `gcc make postgresql yarn python2`
+- install ruby `rvm install ruby-2.6.4`
+- restart the shell to make rvm work as inteded
+- switch to projects ruby version `rvm use 2.6.4`
+- install the ruby gems `bundle`
+- some more dependencies `yarn`
+- add some required folders `mkdir -p shared/log shared/pids shared/sockets`
+- initialize postgresql and create a user `https://wiki.archlinux.org/index.php/PostgreSQL#Initial_configuration`
+- load database migrations `rake db:setup`
+- run the server `rails s`
+- open rails console `rails c`
+- create an admin user `User.create(email: "admin@admin.com", username: "admin", admin: true, password: "1234")`
+- connect `127.0.0.1:3000`
