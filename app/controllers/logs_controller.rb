@@ -84,6 +84,16 @@ def bar
   render json: @log.bar
 end
 
+def cpu
+  @log = Log.find(params[:id])
+  render json: @log.cpu
+end
+
+def cpuavg
+  @log = Log.find(params[:id])
+  render json: @log.cpuavg
+end
+
 def new_benchmark
   @log = Log.new
 end

@@ -46,6 +46,8 @@ Rails.application.routes.draw do
         get 'frametime'
         get 'fps'
         get 'bar'
+        get 'cpu'
+        get 'cpuavg'
         get 'update_blob_filename'
         get 'update_attachment_color'
         get 'update_attachment_name'

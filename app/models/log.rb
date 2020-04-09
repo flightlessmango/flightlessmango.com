@@ -13,16 +13,22 @@ class Log < ApplicationRecord
   def parse_upload
     require 'csv'
     fps_row = 0
+    cpu_row = 0
     inputs_fps = []
     inputs_frametime = []
+    inputs_cpu = []
+    inputs_cpuavg = []
     maxstring = ',{"data":{'
     minstring = '{"data":{'
     avgstring = ',{"data":{'
     onepercentstring = '{"data":{'
     percentile97 = ',{"data":{'
+    cpuavg = '['
     bar_chart = ""
     data_fps = []
     data_fps_only = []
+    data_cpu = []
+    data_cpu_only = []
     allMax = []
     allMin = []
     uploads.attachments.each_with_index do |upload, i|
@@ -33,6 +39,8 @@ class Log < ApplicationRecord
       data_fps = []
       data_fps_only = []
       data_frametime = []
+      data_cpu = []
+      data_cpu_only = []
       parsed = CSV.parse(upload.download)
       if parsed[0][0] == "os"
         if self.computer.nil?
@@ -46,6 +54,9 @@ class Log < ApplicationRecord
             if parse[x] == "Framerate           "
               fps_row = x
             end
+            if parsed[0][i] == "CPU usage           "
+              cpu_row = x
+            end
           end
         end
         count = 0
@@ -54,6 +65,7 @@ class Log < ApplicationRecord
             # 5.times do
               if is_float?(parse[fps_row])
                 data_fps.push([count, parse[fps_row]])
+                data_fps.push([count, parse[cpu_row]])
                 data_fps_only.push(parse[fps_row].to_i)
                 data_frametime.push([count, (1000 / parse[fps_row].to_f).round(2)])
                 count += 1
@@ -68,6 +80,8 @@ class Log < ApplicationRecord
         parsed.each_with_index do |parse, i|
           if i > 2
             data_fps.push([count, parse[0]])
+            data_cpu.push([count, parse[1]])
+            data_cpu_only.push(parse[1])
             data_fps_only.push(parse[0].to_i)
             data_frametime.push([count, (1000 / parse[0].to_f).round(2)])
             count += 1
@@ -81,8 +95,12 @@ class Log < ApplicationRecord
         fpsTotalSorted = fpsTotalSorted + fps.to_i
       end
       fpsTotal = 0
+      cpuTotal = 0
       data_fps_only.each do |fps|
         fpsTotal = fpsTotal + fps.to_i
+      end
+      data_cpu_only.each do |cpu|
+        cpuTotal = cpuTotal + cpu.to_i
       end
       allMax.push(data_fps_only.max)
       allMin.push(data_fps_only.min)
@@ -93,15 +111,19 @@ class Log < ApplicationRecord
         percentile97 = percentile97         + '"' + upload.display_name + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)}"
         onepercentstring = onepercentstring + '"' + upload.display_name + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s}"
         avgstring = avgstring               + '"' + upload.display_name + '"' + ": #{(fpsTotal / data_fps.count).to_s}"
+        cpuavg = cpuavg + '["' + upload.display_name + '"' +  ',"' + (cpuTotal / data_cpu_only.count).to_s + '"' + '"' + ']'
       else
         # maxstring = maxstring               + '"' + display_name + '"' + ": #{data_fps_only.max},"
         # minstring = minstring               + '"' + display_name + '"' + ": #{data_fps_only.min},"
         percentile97 = percentile97         + '"' + upload.display_name + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)},"
         onepercentstring = onepercentstring + '"' + upload.display_name + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s},"
         avgstring = avgstring               + '"' + upload.display_name + '"' + ": #{(fpsTotal / data_fps.count).to_s},"
+        cpuavg = cpuavg + '["' + upload.display_name + '"' +  ',' + '"' + (cpuTotal / data_cpu_only.count).to_s + '"' + '],'
       end
       
+      
       inputs_fps.push(name: upload.display_name, data: data_fps, color: upload.color)
+      inputs_cpu.push(name: upload.display_name, data: data_cpu, color: upload.color)
       inputs_frametime.push(name: upload.display_name, data: data_frametime, color: upload.color)
       upload.update(min: data_fps_only.min, max: data_fps_only.max, avg: fpsTotal / data_fps_only.count, onepercent: fpsTotalSorted / onePercent.count,
                     percentile97: Bench.percentile(data_fps_only.sort, 0.97))
@@ -113,6 +135,7 @@ class Log < ApplicationRecord
       percentile97 = percentile97         + '}, "name": "97th percentile"}'
       bar_chart = "[" + onepercentstring + avgstring + percentile97  + "]"
       bar_chart = bar_chart.tr("'", '"')
+      cpuavg = cpuavg + ']'
       if self.uploads.count > 1
         if self.compare_to == nil
           self.update(compare_to: uploads.blobs.order(:id).first.id)
@@ -120,7 +143,8 @@ class Log < ApplicationRecord
       else
         self.update(compare_to: nil)
       end
-      self.update(fps: inputs_fps.chart_json, frametime: inputs_frametime.chart_json, bar: bar_chart, max: allMax.max, min: allMin.min)
+      self.update(fps: inputs_fps.chart_json, frametime: inputs_frametime.chart_json, bar: bar_chart, max: allMax.max,
+         min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg)
   end
   
   def refresh_json
