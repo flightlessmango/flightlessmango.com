@@ -193,8 +193,9 @@ class Bench < ApplicationRecord
               # },
 
             ]
+      avgcpu_chart = self.inputs.where(bench: self).joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
       benches_game.update(fps: fps_chart, frametime: frametime_chart, full_fps: full_fps_chart,
-                          full_frametime: full_frametime_chart, bar: bar_chart.chart_json, gpu: gpu_chart,
+                          full_frametime: full_frametime_chart, bar: bar_chart.chart_json, gpu: gpu_chart, avgcpu: avgcpu_chart,
                           cpu: cpu_chart, min: benches_game.inputs.minimum(:fps), max: benches_game.inputs.maximum(:fps))
     end
     if self.games.count > 1

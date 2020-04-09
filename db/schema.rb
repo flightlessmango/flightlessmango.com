@@ -90,6 +90,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_154424) do
     t.jsonb "gpu"
     t.integer "min"
     t.integer "max"
+    t.jsonb "avgcpu"
   end
 
   create_table "computers", force: :cascade do |t|
@@ -163,6 +164,8 @@ ActiveRecord::Schema.define(version: 2020_03_12_154424) do
     t.integer "min"
     t.text "title"
     t.text "text"
+    t.jsonb "cpu"
+    t.jsonb "cpuavg"
   end
 
   create_table "types", force: :cascade do |t|

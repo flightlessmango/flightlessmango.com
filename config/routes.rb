@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       get 'bar'
       get 'gpu'
       get 'cpu'
+      get 'avgcpu'
     end
   end
   resources :apis_benches do
