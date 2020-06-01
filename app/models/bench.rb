@@ -103,7 +103,7 @@ class Bench < ApplicationRecord
         # REMOVED CPU/GPU FOR MESA OVERLAY
           Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
                         type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2), cpu: parse[1], gpu: parse[2],
-                        color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+                        color: color, pos: parse[3], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
                         count += 1          
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
     end

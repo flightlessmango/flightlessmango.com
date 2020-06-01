@@ -65,6 +65,8 @@
 <%= render 'frametimechart' %>
 <%#= render 'test_streaming' %>
 <script type="text/javascript">
+var start = Date.now()
+var date = new Date().getTime();
 var id = <%= BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id %>
 
 $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {

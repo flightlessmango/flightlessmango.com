@@ -15,10 +15,13 @@
   function onRefreshFrametime(chart) {
     count++
   	frametimechart.data.datasets.forEach(function(dataset, i) {
+      if (json_fps[i]["data"].length > count){
+      console.log(count)
   		dataset.data.push({
-  			x: Date.now(),
+  			x: start + (json_fps[i].data[count][0] / 1000),
   			y: json_frametime[i].data[count][1]
   		});
+      }
   	});
   }
 
@@ -80,8 +83,8 @@
           type: 'realtime',
           realtime: {
             duration: 15000,
-            refresh: 200,
-            delay: 500,
+            refresh: <%= @benchmark.inputs.minimum(:frametime) %>,
+            delay: 100,
             onRefresh: onRefreshFrametime
           }
         }],
@@ -90,7 +93,7 @@
           ticks: {
             reverse: false,
             stepSize: 5,
-            min: <%#= (BenchesGame.find(benches_game_id).inputs.minimum(:frametime) * 0.75).round(-1) + 1 %>5 ,
+            min: <%#= (BenchesGame.find(benches_game_id).inputs.minimum(:frametime) * 0.75).round(-1) + 1 %>1 ,
             max: <%#= (BenchesGame.find(benches_game_id).inputs.maximum(:frametime) * 1).round() %>25,
           },
           gridLines: {
@@ -103,7 +106,7 @@
             reverse: false,
             display: false,
             stepSize: 5,
-            min: <%#= (BenchesGame.find(benches_game_id).inputs.minimum(:frametime) * 0.75).round(-1) + 1%>5,
+            min: <%#= (BenchesGame.find(benches_game_id).inputs.minimum(:frametime) * 0.75).round(-1) + 1%>51,
             max: <%#= (BenchesGame.find(benches_game_id).inputs.maximum(:frametime) * 1).round()%>25,
           },
           gridLines: {

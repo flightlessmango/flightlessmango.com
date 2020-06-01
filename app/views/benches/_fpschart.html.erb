@@ -10,16 +10,19 @@
   $.getJSON( "/benches_games/" + id + "/full_fps", function( data ) {
     json_fps = data
   })
-    
+  // console.log(id)
   var count = 0
   function onRefresh(chart) {
     $('#time').html(parseInt((Date.now() - now) / 1000))
   	fpschart.data.datasets.forEach(function(dataset, i) {
       $('.progress .progress-bar').css("width", (count / json_fps[0]["data"].length) * 100 + '%')
+      if (json_fps[i]["data"].length > count){
+      console.log(count)
   		dataset.data.push({
-  			x: Date.now(),
+  			x: start + (json_fps[i].data[count][0] / 1000),
   			y: json_fps[i].data[count][1]
   		});
+      }
   	});
     count++
   }
@@ -82,9 +85,9 @@
           },
           type: 'realtime',
           realtime: {
-            duration: 3000,
-            refresh: 200,
-            delay: 500,
+            duration: 5000,
+            refresh: <%= @benchmark.inputs.minimum(:frametime) %>,
+            delay: 100,
             onRefresh: onRefresh
           }
         }],
