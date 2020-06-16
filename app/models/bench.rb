@@ -96,16 +96,19 @@ class Bench < ApplicationRecord
     parsed = CSV.parse(upload.attachment.download)
     count = 0
     length = parsed.count
+    threads = []
       parsed.each_with_index do |parse, i|
-        # Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
-        #               type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2),
-        #               cpu: parse[1].to_f, gpu: plarse[2].to_i, color: color, pos: count)
-        # REMOVED CPU/GPU FOR MESA OVERLAY
+          threads << Thread.new {
           Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
                         type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2), cpu: parse[1], gpu: parse[2],
                         color: color, pos: count, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
                         count += 1          
-        ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
+          }
+          if threads.count > 3
+            threads.each {|thr| thr.join}
+            threads = []
+          end
+          ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
     end
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json
