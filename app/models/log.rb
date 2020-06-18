@@ -145,15 +145,6 @@ class Log < ApplicationRecord
       else
         self.update(compare_to: nil)
       end
-      if type == "mangohud"
-        if Rails.env.production?
-          user_id = 176
-        else
-          user_id = 95
-        end
-      else
-        user_id = self.user_id
-      end
 
       self.update!(fps: inputs_fps.chart_json, frametime: inputs_frametime.chart_json, bar: bar_chart, max: allMax.max,
         min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg, user_id: user_id, computer: self.user.computers.last)
