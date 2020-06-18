@@ -145,7 +145,7 @@ class Log < ApplicationRecord
       end
 
       self.update!(fps: inputs_fps.chart_json, frametime: inputs_frametime.chart_json, bar: bar_chart, max: allMax.max,
-        min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg, user_id: user_id, computer: self.user.computers.last)
+        min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg, computer: user.computers.last)
       end
       
       def refresh_json
