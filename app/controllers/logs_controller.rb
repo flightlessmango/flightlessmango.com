@@ -1,5 +1,5 @@
 class LogsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar, :create]
+  before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar, :create, :cpuavg]
   
   def index
     @q = Game.ransack(params[:q])
