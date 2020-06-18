@@ -3,7 +3,7 @@
     <%= link_to @log.uploads.last.filename, rails_blob_path(@log.uploads.last, disposition: 'attachment') %>
   <% end %>
 <% end %>
-<% if @log.user == current_user %>
+<% if @log.user == current_user && @log.user.username != "MangoHud_Uploader"  %>
   <%= link_to "Edit Benchmark", edit_game_log_path(@game, @log), class: 'btn btn-warning' %>
   <%= link_to "Remove Benchmark",
               game_log_path(@game, @log),
@@ -16,6 +16,7 @@
 <% else %>
 <div class="container">
   <div class="row">
+    <% if @log.user.username != "MangoHud_Uploader" %>
     <div class="col-3 mx-auto" style="padding-right: 5px; padding-top: 0px;">
         <a href="<%= user_path(@log.user) %>"><img src="<%= @log.user.image %>" align="right" class="rounded" height="100px"></a>
       <br><br><br><br><br>
@@ -35,6 +36,7 @@
         </div>
       </div>
     </div>
+    <% end %>
     <div class="col-3 text-left mx-auto" style="padding: 0px; padding-left: 5px;">
       <% if @log.computer.present? %>
         <p>

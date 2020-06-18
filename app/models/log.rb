@@ -10,7 +10,7 @@ class Log < ApplicationRecord
     !!Float(fl) rescue false
   end
   
-  def parse_upload
+  def parse_upload(type)
     require 'csv'
     fps_row = 0
     cpu_row = 0
@@ -42,10 +42,12 @@ class Log < ApplicationRecord
       data_cpu = []
       data_cpu_only = []
       parsed = CSV.parse(upload.download)
-      if parsed[0][0] == "os"
-        if self.computer.nil?
-          Computer.create(os: parsed[1][0], cpu: parsed[1][1], gpu: parsed[1][2], ram: parsed[1][3],
-          kernel: parsed[1][4], driver: parsed[1][5], log_id: self.id, user_id: self.user_id)
+      if type == "other"
+        if parsed[0][0] == "os"
+          if self.computer.nil?
+            Computer.create(os: parsed[1][0], cpu: parsed[1][1], gpu: parsed[1][2], ram: parsed[1][3],
+            kernel: parsed[1][4], driver: parsed[1][5], log_id: self.id)
+          end
         end
       end
       if upload.filename.extension == "hml"
@@ -63,16 +65,16 @@ class Log < ApplicationRecord
         parsed.each_with_index do |parse, i|
           unless parse[fps_row] == nil || parse[fps_row] == "Framerate           "
             # 5.times do
-              if is_float?(parse[fps_row])
-                data_fps.push([count, parse[fps_row]])
-                data_fps.push([count, parse[cpu_row]])
-                data_fps_only.push(parse[fps_row].to_i)
-                data_frametime.push([count, (1000 / parse[fps_row].to_f).round(2)])
-                count += 1
-              end
+            if is_float?(parse[fps_row])
+              data_fps.push([count, parse[fps_row]])
+              data_fps.push([count, parse[cpu_row]])
+              data_fps_only.push(parse[fps_row].to_i)
+              data_frametime.push([count, (1000 / parse[fps_row].to_f).round(2)])
+              count += 1
+            end
             # end
           end
-
+          
         end
         
       else
@@ -126,7 +128,7 @@ class Log < ApplicationRecord
       inputs_cpu.push(name: upload.display_name, data: data_cpu, color: upload.color)
       inputs_frametime.push(name: upload.display_name, data: data_frametime, color: upload.color)
       upload.update(min: data_fps_only.min, max: data_fps_only.max, avg: fpsTotal / data_fps_only.count, onepercent: fpsTotalSorted / onePercent.count,
-                    percentile97: Bench.percentile(data_fps_only.sort, 0.97))
+        percentile97: Bench.percentile(data_fps_only.sort, 0.97))
       end
       maxstring = maxstring               + '}, "name":"Max"}'
       minstring = minstring               + '}, "name":"Min"}'
@@ -143,17 +145,27 @@ class Log < ApplicationRecord
       else
         self.update(compare_to: nil)
       end
-      self.update(fps: inputs_fps.chart_json, frametime: inputs_frametime.chart_json, bar: bar_chart, max: allMax.max,
-         min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg)
-  end
-  
-  def refresh_json
-    inputs.where(fps: 0).delete_all
-      names = Log.last.inputs.pluck(:name).uniq
-      fps_chart       = names.map { |name| {name: name, data: inputs.where(name: name).group(:pos).average(:fps)}}.chart_json
-      frametime_chart = names.map { |name| {name: name, data: inputs.where(name: name).group(:pos).average(:frametime)}}.chart_json
-      bar_chart = [
-              {
+      if type == "mangohud"
+        if Rails.env.production?
+          user_id = 176
+        else
+          user_id = 95
+        end
+      else
+        user_id = self.user_id
+      end
+
+      self.update!(fps: inputs_fps.chart_json, frametime: inputs_frametime.chart_json, bar: bar_chart, max: allMax.max,
+        min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg, user_id: user_id, computer: self.user.computers.last)
+      end
+      
+      def refresh_json
+        inputs.where(fps: 0).delete_all
+        names = Log.last.inputs.pluck(:name).uniq
+        fps_chart       = names.map { |name| {name: name, data: inputs.where(name: name).group(:pos).average(:fps)}}.chart_json
+        frametime_chart = names.map { |name| {name: name, data: inputs.where(name: name).group(:pos).average(:frametime)}}.chart_json
+        bar_chart = [
+          {
                 name: 'Max',
                 data: inputs.group(:name).maximum(:fps),
               },

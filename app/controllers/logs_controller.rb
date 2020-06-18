@@ -1,9 +1,9 @@
 class LogsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar]
+  before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar, :create]
   
   def index
     @q = Game.ransack(params[:q])
-    @games = @q.result(distinct: true).where.not(source: 'mango').includes(:logs).paginate(page: params[:page], per_page: 30)
+    @games = @q.result(distinct: true).where.not(source: 'mango').where.not(name: 'MangoHud Uploader').includes(:logs).paginate(page: params[:page], per_page: 30)
     respond_to do |format|
       format.html
       format.js
@@ -31,9 +31,17 @@ class LogsController < ApplicationController
     respond_to do |format|
       if @log.save(:validate => false)
         if @log.uploads.any?
-          @log.parse_upload
+          if request.user_agent == "mangohud"
+            @log.parse_upload("mangohud")
+          else
+            @log.parse_upload("other")
+          end
         end
-        format.html { redirect_to edit_game_log_path(@game, @log), notice: 'Logmark was successfully created.' }
+        if request.user_agent == "mangohud"
+          format.html { redirect_to log_path(@log), notice: 'Logmark was successfully created.' }
+        else 
+          format.html { redirect_to edit_game_log_path(@game, @log), notice: 'Logmark was successfully created.' }
+        end
         format.js
       else
 
@@ -46,7 +54,11 @@ class LogsController < ApplicationController
   @game = @log.game
   respond_to do |format|
     if @log.update(log_params)
-      @log.parse_upload
+      if request.user_agent == "mangohud"
+        @log.parse_upload("mangohud")
+      else
+        @log.parse_upload("other")
+      end
       if params[:attachment]
         format.html { redirect_to edit_game_log_path(@game, @log), flash: {success: 'Successfully uploaded'} }
       else
