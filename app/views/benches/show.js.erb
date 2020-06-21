@@ -12,29 +12,30 @@
 <% end %>
 
 <% if params[:type] == "fps" %>
-    $('#mobileGraph').html("<%= j line_chart fps_benches_game_path(benches_game),
-     points: false, curve: false, download: true, title: 'FPS', xtitle: "Time",
-     ytitle: "FPS", library: {tooltip: {shared: true}, id: 'fps',
-     yAxis: {min: benches_game.min}, xAxis: {labels: {enabled: false}},
-     subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}},
-     height: '400px' %>")
+$('#mobileGraph').html(
+        "<%= j line_chart fps_benches_game_path(benches_game),
+        points: false, curve: false, download: true, title: "FPS", legend: true,
+        height: '400px', min: benches_game.min, xmax: benches_game.inputs.count / benches_game.types.count,
+        adapter: "chartjs", library: {scales: {xAxis: { gridLines: { color: "#707073"}}},title: { fontColor: "white"}} %>"
+)
 <% end %>
 
 <% if params[:type] == "frametime" %>
-    $('#mobileGraph').html("<%= j line_chart frametime_benches_game_path(benches_game),
-     points: false, curve: false, download: true, title: 'Frametime', xtitle: "Time",
-     ytitle: "Frame Time", library: {tooltip: {shared: true}, id: 'frametime',
-     yAxis: {min: 1000 / benches_game.max}, xAxis: {labels: {enabled: false}},
-     subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}},
-     height: '400px' %>")
+     $('#mobileGraph').html(
+        "<%= j line_chart frametime_benches_game_path(benches_game),
+        points: false, curve: false, download: true, title: "Frametime", legend: true,
+        height: '400px', xmax: benches_game.inputs.count / benches_game.types.count,
+        adapter: "chartjs", library: {scales: {xAxis: { gridLines: { color: "#707073"}}},title: { fontColor: "white"}} %>"
+        )
 <% end %>
 
 <% if params[:type] == "cpu" %>
-    $('#mobileGraph').html("<%= j line_chart cpu_benches_game_path(benches_game),
-    points: false, curve: false, download: true, title: 'CPU Load', xtitle: "Time", ytitle: "Load", id: 'cpu',
-    library: {tooltip: {shared: true},yAxis: {max: 100}, xAxis: {labels: {enabled: false}},
-    subtitle: {useHTML: true}}, height: '400px'
-     %>")
+        $('#mobileGraph').html(
+        "<%= j line_chart cpu_benches_game_path(benches_game),
+        points: false, curve: false, download: true, title: "CPU Load", legend: true,
+        height: '400px', xmax: benches_game.inputs.count / benches_game.types.count,
+        adapter: "chartjs", library: {scales: {xAxis: { gridLines: { color: "#707073"}}},title: { fontColor: "white"}} %>"
+        )
 <% end %>
 
 <% if browser.device.mobile? %>
