@@ -4,7 +4,7 @@ class BenchesController < ApplicationController
     if user_signed_in? && current_user.admin?
       @benchmarks = Bench.all
     else
-      @benchmarks = Bench.where(published: true)
+      @benchmarks = Bench.where(published: true).paginate(page: params[:page], per_page: 15)
     end
   end
   
