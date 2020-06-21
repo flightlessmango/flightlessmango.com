@@ -2,7 +2,7 @@ class BenchesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar, :total_cpu, :recording]
   def index
     if user_signed_in? && current_user.admin?
-      @benchmarks = Bench.all
+      @benchmarks = Bench.all.paginate(page: params[:page], per_page: 15)
     else
       @benchmarks = Bench.where(published: true).paginate(page: params[:page], per_page: 15)
     end
