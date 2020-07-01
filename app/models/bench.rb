@@ -154,6 +154,7 @@ class Bench < ApplicationRecord
     Input.where(fps: 0).delete_all
     onepercent = {}
     percentile97 = {}
+    self.inputs.where(fps: nil).delete_all
     self.games.each do |game|
       
       benches_game = BenchesGame.where(game_id: game.id, bench_id: self.id).last
