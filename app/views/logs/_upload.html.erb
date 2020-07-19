@@ -1,5 +1,5 @@
 <%= form_for [@game, @log], :html => {:class => "form-horizontal center"}, remote: false do |f| %>
-  <%#= f.hidden_field :game_id, value: @game.id %>
+  <%= f.hidden_field :log, value: @log %>
     <div class="row">
       <div class="col-4">
       Log files
