@@ -39,7 +39,7 @@ class GamesController < ApplicationController
   def show
     @game = Game.find(params[:id])
     @logs = @game.logs
-    @benchmarks = @game.benches
+    @benchmarks = @game.benches.paginate(page: params[:page], per_page: 30)
   end
   
   def user_submissions
