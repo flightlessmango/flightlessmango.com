@@ -42,14 +42,14 @@ class Log < ApplicationRecord
       data_cpu = []
       data_cpu_only = []
       parsed = CSV.parse(upload.download)
-      if type == "other"
+
         if parsed[0][0] == "os"
           if self.computer.nil?
             Computer.create(os: parsed[1][0], cpu: parsed[1][1], gpu: parsed[1][2], ram: parsed[1][3],
             kernel: parsed[1][4], driver: parsed[1][5], log_id: self.id, user_id: self.user_id)
           end
         end
-      end
+
       if upload.filename.extension == "hml"
         parsed.each_with_index do |parse, i|
           1000.times do |x|
