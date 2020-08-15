@@ -113,14 +113,14 @@ class Log < ApplicationRecord
         percentile97 = percentile97         + '"' + upload.display_name + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)}"
         onepercentstring = onepercentstring + '"' + upload.display_name + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s}"
         avgstring = avgstring               + '"' + upload.display_name + '"' + ": #{(fpsTotal / data_fps.count).to_s}"
-        cpuavg = cpuavg + '["' + upload.display_name + '"' +  ',"' + (cpuTotal / data_cpu_only.count).to_s + '"' + '"' + ']'
+        # cpuavg = cpuavg + '["' + upload.display_name + '"' +  ',"' + (cpuTotal / data_cpu_only.count).to_s + '"' + '"' + ']'
       else
         # maxstring = maxstring               + '"' + display_name + '"' + ": #{data_fps_only.max},"
         # minstring = minstring               + '"' + display_name + '"' + ": #{data_fps_only.min},"
         percentile97 = percentile97         + '"' + upload.display_name + '"' + ": #{Bench.percentile(data_fps_only.sort, 0.97)},"
         onepercentstring = onepercentstring + '"' + upload.display_name + '"' + ": #{(fpsTotalSorted / onePercent.count).to_s},"
         avgstring = avgstring               + '"' + upload.display_name + '"' + ": #{(fpsTotal / data_fps.count).to_s},"
-        cpuavg = cpuavg + '["' + upload.display_name + '"' +  ',' + '"' + (cpuTotal / data_cpu_only.count).to_s + '"' + '],'
+        # cpuavg = cpuavg + '["' + upload.display_name + '"' +  ',' + '"' + (cpuTotal / data_cpu_only.count).to_s + '"' + '],'
       end
       
       
