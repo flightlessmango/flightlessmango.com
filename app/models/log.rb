@@ -147,7 +147,7 @@ class Log < ApplicationRecord
       end
       if type == "other"
         self.update!(fps: inputs_fps.chart_json, frametime: inputs_frametime.chart_json, bar: bar_chart, max: allMax.max,
-          min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg, computer: user.computers.last)
+          min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg, computer: self.computer)
       else
         self.update!(fps: inputs_fps.chart_json, frametime: inputs_frametime.chart_json, bar: bar_chart, max: allMax.max,
           min: allMin.min, cpu: inputs_cpu.chart_json, cpuavg: cpuavg)
