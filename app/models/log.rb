@@ -49,7 +49,11 @@ class Log < ApplicationRecord
             kernel: parsed[1][4], driver: parsed[1][5], log_id: self.id, user_id: self.user_id)
           end
         end
-
+      if self.computer != nil
+        if self.computer.cpu == nil
+          self.computer.delete
+        end
+      end
       if upload.filename.extension == "hml"
         parsed.each_with_index do |parse, i|
           1000.times do |x|
