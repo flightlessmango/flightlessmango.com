@@ -40,7 +40,7 @@ class Bench < ApplicationRecord
       parsed.each_with_index do |parse, i|
         Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(bench_id: self.id, game_id: game_id).last.id,
                       type_id: type_id, fps: parse[1], frametime: (1000 / parse[1].to_f).round(2),
-                      cpu: parse[2].to_f, gpu: parse[2].to_i, color: color, pos: i, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+                      cpu: parse[2].to_f, gpu: parse[2].to_i, color: color, pos: parse[3], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 100 == 0
     end
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
@@ -100,8 +100,8 @@ class Bench < ApplicationRecord
       parsed.each_with_index do |parse, i|
           threads << Thread.new {
           Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
-                        type_id: type_id, fps: parse[0], frametime: (1000 / parse[0].to_f).round(2), cpu: parse[1], gpu: parse[2],
-                        color: color, pos: i, apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+                        type_id: type_id, fps: parse[0], frametime: parse[1], cpu: parse[2], gpu: parse[3],
+                        color: color, pos: parse[10], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
           }
           if threads.count > 3
             threads.each {|thr| thr.join}

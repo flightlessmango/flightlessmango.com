@@ -86,8 +86,8 @@ class Log < ApplicationRecord
         parsed.each_with_index do |parse, i|
           if i > 2
             data_fps.push([count, parse[0]])
-            data_cpu.push([count, parse[1]])
-            data_cpu_only.push(parse[1])
+            data_cpu.push([count, parse[2]])
+            data_cpu_only.push(parse[2])
             data_fps_only.push(parse[0].to_i)
             data_frametime.push([count, (1000 / parse[0].to_f).round(2)])
             count += 1
