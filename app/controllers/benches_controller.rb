@@ -15,6 +15,7 @@ class BenchesController < ApplicationController
     respond_to do |format|
       format.html {}
       format.js
+      format.json { render :show, location: @benchmark }
     end
   end
   
