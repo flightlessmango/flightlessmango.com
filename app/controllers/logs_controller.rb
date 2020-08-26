@@ -23,6 +23,11 @@ class LogsController < ApplicationController
   def show
     @log = Log.find(params[:id])
     @game = @log.game
+    respond_to do |format|
+      format.html {}
+      format.js
+      format.json { render :show, location: @log }
+    end
   end
   
   def create
