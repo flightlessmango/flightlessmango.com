@@ -4,9 +4,9 @@
 <%= line_chart frametime_game_log_path(@log), colors: Bench::COLORS,
    points: false, curve: false, download: true, title: 'Frame Time', id: 'frametime',
    library: {yAxis: {min: 1000 / @log.max},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px' %>
-  <% if @log.cpuavg != nil %>
-    <%= line_chart cpu_game_log_path(@log), colors: Bench::TWENTY, title: 'CPU Load', height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
-  <% end %>
+  <%# if @log.cpuavg != nil %>
+    <%#= line_chart cpu_game_log_path(@log), colors: Bench::TWENTY, title: 'CPU Load', height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+  <%# end %>
 <%= bar_chart bar_game_log_path(@log), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Max/Average', id: 'bar', ytitle: "FPS",
 library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px' %> 
 <br>
