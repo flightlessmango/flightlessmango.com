@@ -28,22 +28,22 @@
   </nav>
   <div class="tab-content" id="pills-tabContent" style="padding: 25px 0px 0px;">
       <% benches_game = BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last %>
-      <% if browser.device.mobile? %>
-      <%= render partial: 'graphs_mobile', locals: {benches_game: benches_game} %>
-      <% else %>
+      <%# if browser.device.mobile? %>
+      <%#= render partial: 'graphs_mobile', locals: {benches_game: benches_game} %>
+      <%# else %>
       <%= render partial: 'graphs', locals: {benches_game: benches_game} %>
-      <% end %>
+      <%# end %>
       
     </div>
     <!-- <div id="loadingSpinner" class="loader" style="margin-top: 50px; margin-bottom: 200px;"></div> -->
     <% else %>
     <!-- <div id="loadingSpinner" class="loader" style="margin-top: 50px; margin-bottom: 200px;"></div> -->
       <% benches_game = BenchesGame.where(game_id: @benchmark.games.first.id, bench_id: @benchmark.id).last %>
-      <% if browser.device.mobile? %>
-        <%= render partial: 'graphs_mobile', locals: {benches_game: benches_game} %>
-      <% else %>
+      <%# if browser.device.mobile? %>
+        <%#= render partial: 'graphs_mobile', locals: {benches_game: benches_game} %>
+      <%# else %>
         <%= render partial: 'graphs', locals: {benches_game: benches_game} %>
-      <% end %>
+      <%# end %>
     <% end %>
   <% end %>
 <% end %>
