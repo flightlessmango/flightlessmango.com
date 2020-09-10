@@ -12,7 +12,7 @@
         points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
         id: 'frametime',height: '400px', min: 1000 / benches_game.max %>
     <% if !benches_game.inputs.where(gpu: nil).any? && benches_game.avgcpu != nil%>
-      <%= column_chart avgcpu_benches_game_path(benches_game), id: 'cpu', max: 100, colors: Bench::TWENTY, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+      <%#= column_chart avgcpu_benches_game_path(benches_game), id: 'cpu', max: 100, colors: Bench::TWENTY, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
     <% end %>
   <% end %>
 
