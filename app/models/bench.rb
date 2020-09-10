@@ -11,7 +11,7 @@ class Bench < ApplicationRecord
   
   COLORS    =  ["#3398dc", "#6639b6", "#e64b3b", "#72c02c", "#ebc71d", "#ed4a82", "#b09980", "#22e3be", "#fe541e", "#00BB27", "#4000FF"]
   COLORSRGB =  ["rgba(51,152,220,1)", "rgba(102,57,182,1)", "rgba(230,75,59,1)", "rgba(114,192,44,1)", "rgba(235,199,29,1)"]
-  TWENTY    =  [ '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8',
+  TWENTY    =  [ '#e6194b', '#3cb44b', '#4363d8', '#911eb4', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8',
      '#800000', '#aaffc3', '#808000', '#000075', '#808080' ]
   FILETYPES = ["MANGO", "OCAT", "HML"]
   
