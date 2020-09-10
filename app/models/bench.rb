@@ -100,7 +100,7 @@ class Bench < ApplicationRecord
       parsed.each_with_index do |parse, i|
           threads << Thread.new {
           Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
-                        type_id: type_id, fps: parse[0], frametime: parse[1], cpu: parse[2], gpu: parse[3],
+                        type_id: type_id, fps: parse[0], frametime: parse[1].to_f / 1000, cpu: parse[2], gpu: parse[3],
                         color: color, pos: parse[10], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
           }
           if threads.count > 3
@@ -156,10 +156,16 @@ class Bench < ApplicationRecord
     percentile97 = {}
     self.inputs.where(fps: nil).delete_all
     self.games.each do |game|
-      
+
       benches_game = BenchesGame.where(game_id: game.id, bench_id: self.id).last
-      fps_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 5 == 0 }.compact.pluck(:id)).group(:pos).average(:fps), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
-      frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {|input| input if input.id % 5 == 0 }.compact.pluck(:id)).group(:pos).average(:frametime), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      fps_chart = benches_game.types.order(:name).map { |type|
+        {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(
+        id: type.inputs.map {|input| input if input.pos.to_i % 100 == 0 }.compact.pluck(:id)).group(:pos).average(:fps),
+        color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(
+        benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {
+        |input| input if input.pos.to_i % 100 == 0 }.compact.pluck(:id)).group(:pos).average(:frametime),
+        color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
       full_fps_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:fps), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
       full_frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:frametime), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
       gpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:gpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
