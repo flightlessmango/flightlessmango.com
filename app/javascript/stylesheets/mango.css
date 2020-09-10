@@ -195,3 +195,12 @@ a:hover {
     transform: rotate(360deg);
   }
 }
+
+.js-plotly-plot .plotly .modebar{
+  /* top: 20%; */
+  /* left: 50%; */
+  transform: translateX(-15%);
+  /* position: absolute; */
+  /* right: -50; */
+  
+}
