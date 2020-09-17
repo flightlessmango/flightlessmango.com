@@ -64,10 +64,10 @@
           $.each(charts, function (i, value){
             chart = Chartkick.charts[value]
             <% if game.inputs.count > 5000 %>
-              chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + value)
+              chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + 'full_' + value)
             <% else %>
               if(value == 'bar'){
-                chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + value)
+                chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + 'full_' + value)
               } else {
                 chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + 'full_' + value)
               }
