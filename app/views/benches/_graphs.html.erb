@@ -155,118 +155,52 @@ function get_layout_fps(){
   return layout
 }
 
-function get_layout_frametime(){
+function resize_plotly(){
   var elmnt = document.getElementById("main-container");
   var width = elmnt.clientWidth;
   console.log(width);
   var layout = {
-    margin: {
-      r: 50,
-      t: 40,
-      l: 50,
-    },
-    modebar: {
-      orientation: 'h',
-      bgcolor: "222",
-      color: 'white',
-      // x: -0.5,
-    },
-    title: {
-      text:'Frametime',
-      xanchor: 'center',
-      // x: 0,
-    },
-    hovermode: false,
     width: width.toString(),
-    showlegend: true,
-    responsive: true,
-    legend: {
-      xanchor: 'center',
-      x: 0.5,
-      y: -0.2,
-      yanchor: 'bottom',
-      orientation: "h",
-    },
-    font: {
-      family: 'lato, sans-serif',
-      size: 18,
-      color: '#E0E0E3'
-    },
-    plot_bgcolor: "rgba(1,1,1,0)",
-    paper_bgcolor: "rgba(1,1,1,0)",
-    xaxis: {
-      showgrid: false,
-      autotick: true,
-      ticks: '',
-      showticklabels: false,
-    },
-    yaxis: {
-      // range: [<%= 1000 / benches_game.max %>, <%= 1000 / benches_game.min %>],
-      tickfont: {
-        color: "#E0E0E3",
-      },
-      showgrid: true,
-      zerolinecolor:  '#707073',
-      zeroline: true,
-      gridcolor: '#707073',
-    },
   }
   return layout
 }
 <% saved_inputs = benches_game.inputs %>
 
 function fps_chart(){
-  var data = []
-  <% benches_game.types.order(name: :desc).each do |type| %>
-    window["trace-<%= type.id %>"] = {
-      x: <%= saved_inputs.where(type: type).order(pos: :asc).pluck(:pos) %>,
-      y: <%= saved_inputs.where(type: type).order(pos: :asc).pluck(:fps) %>,
-      mode: 'lines',
-      line: {
-        color: '<%= type.inputs.last.color %>',
-        width: 2
-      },
-      type: 'scatter',
-      name: "<%= type.name %>",
-    },
+  <% if browser.device.mobile? %>
+    $.getJSON('<%= fps_benches_game_path(benches_game) %>' + '.json', function(data) {
+      Plotly.newPlot('fps_chart', data);
+    })
+    Plotly.setPlotConfig({
+      displayModeBar: false
+    });
+  <% else %>
+    $.getJSON('<%= full_fps_benches_game_path(benches_game) %>' + '.json', function(data) {
+      Plotly.newPlot('fps_chart', data, {displayModeBar: false});
+    })
   <% end %>
-  <% @benchmark.types.order(name: :asc).each do |type| %>
-    data.push(window["trace-<%= type.id %>"]);
-  <% end %>
-
-  // data = []
-  $.getJSON('<%= full_fps_benches_game_path(benches_game) %>' + '.json', function(data) {
-    Plotly.newPlot('fps_chart', data);
-  })
   
 }
 
 function frametime_chart(){
   var data = []
-  <% benches_game.types.order(name: :desc).each do |type| %>
-    window["trace-<%= type.id %>"] = {
-      x: <%= saved_inputs.where(type: type).order(pos: :asc).pluck(:pos) %>,
-      y: <%= saved_inputs.where(type: type).order(pos: :asc).pluck(:frametime) %>,
-      mode: 'lines',
-      line: {
-        color: '<%= type.inputs.where(bench: @benchmark).last.color %>',
-        width: 2
-      },
-      type: 'scatter',
-      name: "<%= type.name %>",
-    },
-  <% end %>
-  <% @benchmark.types.order(name: :asc).each do |type| %>
-    data.push(window["trace-<%= type.id %>"]);
+  <% if browser.device.mobile? %>
+    $.getJSON('<%= frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
+      Plotly.newPlot('frametime_chart', data);
+    })
+    Plotly.setPlotConfig({
+      displayModeBar: false
+    });
+  <% else %>
+    $.getJSON('<%= full_frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
+      Plotly.newPlot('frametime_chart', data);
+    })
   <% end %>
 
-  $.getJSON('<%= full_frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
-    Plotly.newPlot('frametime_chart', data);
-  })
 }
 function resize_charts(){
-  Plotly.relayout('fps_chart', get_layout_fps())
-  Plotly.relayout('frametime_chart', get_layout_frametime())
+  Plotly.relayout('fps_chart', resize_plotly())
+  Plotly.relayout('frametime_chart', resize_plotly())
 }
 $( document ).ready(function() {
   fps_chart();
