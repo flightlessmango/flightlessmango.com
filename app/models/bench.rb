@@ -1,4 +1,5 @@
 class Bench < ApplicationRecord
+  include Rails.application.routes.url_helpers
   extend FriendlyId
   friendly_id :youtubeid, use: :slugged
 
@@ -166,18 +167,20 @@ class Bench < ApplicationRecord
     onepercent = {}
     percentile97 = {}
     self.inputs.where(fps: nil).delete_all
-      fps_chart = benches_game.types.order(:name).map { |type|
-        {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(
-        id: type.inputs.map {|input| input if input.pos.to_i % 100 == 0 }.compact.pluck(:id)).group(:pos).average(:fps),
-        color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
-      frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(
-        benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {
-        |input| input if input.pos.to_i % 100 == 0 }.compact.pluck(:id)).group(:pos).average(:frametime),
-        color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
-      full_fps_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:fps), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
-      full_frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:frametime), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
-      gpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:gpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
-      cpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:cpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+    full_frametime_chart = {}
+    full_fps_chart = {}
+      # fps_chart = benches_game.types.order(:name).map { |type|
+      #   {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(
+      #   id: type.inputs.map {|input| input if input.pos.to_i % 100 == 0 }.compact.pluck(:id)).group(:pos).average(:fps),
+      #   color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      # frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(
+      #   benches_game_id: benches_game.id).where(bench_id: self.id).where(id: type.inputs.map {
+      #   |input| input if input.pos.to_i % 100 == 0 }.compact.pluck(:id)).group(:pos).average(:frametime),
+      #   color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      # full_fps_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:fps), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      # full_frametime_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:frametime), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      # gpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:gpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
+      # cpu_chart = benches_game.types.order(:name).map { |type| {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).group(:pos).average(:cpu), color: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).last.color}}.chart_json
       onepercent = {}
       benches_game.types.order(name: :asc).each do |type|
         typeInputs = type.inputs.where(game_id: benches_game.game_id, bench_id: benches_game.bench_id)
@@ -209,10 +212,32 @@ class Bench < ApplicationRecord
               # },
 
             ]
-      avgcpu_chart = self.inputs.where(bench: self).joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
-      benches_game.update(fps: fps_chart, frametime: frametime_chart, full_fps: full_fps_chart,
-                          full_frametime: full_frametime_chart, bar: bar_chart.chart_json, gpu: gpu_chart, avgcpu: avgcpu_chart,
-                          cpu: cpu_chart, min: benches_game.inputs.minimum(:fps), max: benches_game.inputs.maximum(:fps))
+      require "json"
+      require "net/http"
+      require "uri"
+      http_protocol = ""
+      if Rails.env.development?
+        http_protocol = "http"
+      else
+        http_protocol = "https"
+      end
+      ["fps", "frametime"].each do |graph_type|
+        puts graph_type
+        url = url_for(action: 'show', controller: 'benches_games', only_path: false, protocol: http_protocol, id: benches_game.id, :format => :json, :graph_type => graph_type)
+        uri = URI(url)
+        response = Net::HTTP.get(uri)
+        puts url
+        if graph_type == "fps"
+          full_fps_chart = response
+        else
+          full_frametime_chart = response
+        end
+      end
+
+      # avgcpu_chart = self.inputs.where(bench: self).joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
+      benches_game.update(full_fps: full_fps_chart, full_frametime: full_frametime_chart,
+                          bar: bar_chart.chart_json,min: benches_game.inputs.minimum(:fps),
+                          max: benches_game.inputs.maximum(:fps))
     end
     if self.games.count > 1
       totalbar_chart = self.types.order(name: :asc).map {|type| {name: type.name, data: type.inputs.joins(:type).where(bench: self).group('types.name').average(:fps)}}
@@ -220,7 +245,7 @@ class Bench < ApplicationRecord
       self.update(totalbar: totalbar_chart.chart_json, totalcpu: totalcpu_chart)
     end
   end
-  
+
   def refresh_json_api
     Input.where(fps: 0).delete_all
     if self.apis.count > 1

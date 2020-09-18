@@ -1,5 +1,5 @@
 class BenchesGamesController < ApplicationController
-  before_action :authenticate_user!, except: [:fps, :frametime, :full_fps, :full_frametime, :bar, :gpu, :cpu]
+  before_action :authenticate_user!, except: [:fps, :frametime, :full_fps, :full_frametime, :bar, :gpu, :cpu, :show]
   def destroy
   @benches_game = BenchesGame.find(params[:id])
   @benchmark = @benches_game.bench
@@ -29,6 +29,16 @@ end
     end
   end
   
+  def show
+    @benches_game = BenchesGame.find(params[:id])
+    @benchmark = @benches_game.bench
+    @graph_type = params[:graph_type]
+    # @benches_game.creator = current_userl
+    respond_to do |format|
+        format.json { render :show, status: :created, location: @benchmark }
+      end
+  end
+
   def frametime
     @benches_game = BenchesGame.find(params[:id])
     render json: @benches_game.frametime
@@ -46,7 +56,10 @@ end
   
   def full_fps
     @benches_game = BenchesGame.find(params[:id])
-    render json: @benches_game.full_fps
+    respond_to do |format|
+      format.json {render json: @benches_game.full_fps}
+      format.html {render json: @benches_game.full_fps}
+    end
   end
   
   def bar
@@ -72,6 +85,6 @@ end
   private
   # Never trust parameters from the scary internet, only allow the white list through.
   def benches_game_params
-    params.require(:benches_game).permit(:game_id, :bench_id)
+    params.permit(:game_id, :bench_id)
   end
 end

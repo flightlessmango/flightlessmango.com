@@ -213,13 +213,14 @@ function get_layout_frametime(){
   }
   return layout
 }
+<% saved_inputs = benches_game.inputs %>
 
 function fps_chart(){
   var data = []
   <% benches_game.types.order(name: :desc).each do |type| %>
     window["trace-<%= type.id %>"] = {
-      x: <%= benches_game.inputs.where(type: type).order(pos: :asc).pluck(:pos) %>,
-      y: <%= benches_game.inputs.where(type: type).order(pos: :asc).pluck(:fps) %>,
+      x: <%= saved_inputs.where(type: type).order(pos: :asc).pluck(:pos) %>,
+      y: <%= saved_inputs.where(type: type).order(pos: :asc).pluck(:fps) %>,
       mode: 'lines',
       line: {
         color: '<%= type.inputs.last.color %>',
@@ -234,15 +235,18 @@ function fps_chart(){
   <% end %>
 
   // data = []
-  Plotly.newPlot('fps_chart', data, get_layout_fps());
+  $.getJSON('<%= full_fps_benches_game_path(benches_game) %>' + '.json', function(data) {
+    Plotly.newPlot('fps_chart', data);
+  })
+  
 }
 
 function frametime_chart(){
   var data = []
   <% benches_game.types.order(name: :desc).each do |type| %>
     window["trace-<%= type.id %>"] = {
-      x: <%= benches_game.inputs.where(type: type).order(pos: :asc).pluck(:pos) %>,
-      y: <%= benches_game.inputs.where(type: type).order(pos: :asc).pluck(:frametime) %>,
+      x: <%= saved_inputs.where(type: type).order(pos: :asc).pluck(:pos) %>,
+      y: <%= saved_inputs.where(type: type).order(pos: :asc).pluck(:frametime) %>,
       mode: 'lines',
       line: {
         color: '<%= type.inputs.where(bench: @benchmark).last.color %>',
@@ -256,8 +260,9 @@ function frametime_chart(){
     data.push(window["trace-<%= type.id %>"]);
   <% end %>
 
-  // data = []
-  Plotly.newPlot('frametime_chart', data, get_layout_frametime());
+  $.getJSON('<%= full_frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
+    Plotly.newPlot('frametime_chart', data);
+  })
 }
 function resize_charts(){
   Plotly.relayout('fps_chart', get_layout_fps())
