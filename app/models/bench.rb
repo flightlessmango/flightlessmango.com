@@ -107,6 +107,10 @@ class Bench < ApplicationRecord
                         type_id: type_id, fps: parse[0], frametime: parse[1].to_f / 1000, cpu: parse[2], gpu: parse[3],
                         color: color, pos: parse[10], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
           inputs.push(input)
+          if inputs.count > 1000
+            Input.import inputs
+            inputs = []
+          end
           # }
           # if threads.count > 3
             # threads.each {|thr| thr.join}
@@ -114,7 +118,7 @@ class Bench < ApplicationRecord
           # end
           ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
       end
-    Input.import inputs;
+    Input.import inputs
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json(benches_game)
     # self.refresh_json_api
