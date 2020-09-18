@@ -101,11 +101,13 @@ class Bench < ApplicationRecord
     length = parsed.count
     threads = []
     inputs = []
+    api_bench = ApisBench.where(bench_id: self.id, api_id: api_id).last
+    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
       parsed.each_with_index do |parse, i|
           # threads << Thread.new {
-          input = Input.new(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
+          input = Input.new(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: benches_game.id,
                         type_id: type_id, fps: parse[0], frametime: parse[1].to_f / 1000, cpu: parse[2], gpu: parse[3],
-                        color: color, pos: parse[10], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+                        color: color, pos: parse[10], apis_bench_id: api_bench.id, api_id: api_id)
           inputs.push(input)
           if inputs.count > 1000
             Input.import inputs
@@ -119,7 +121,6 @@ class Bench < ApplicationRecord
           ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
       end
     Input.import inputs
-    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json(benches_game)
     # self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
