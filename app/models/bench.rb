@@ -7,6 +7,7 @@ class Bench < ApplicationRecord
   has_many :inputs
   has_many :types, -> { distinct }, through: :inputs
   has_many :variations, -> { distinct }, through: :inputs
+  has_many :benches_games
   has_one_attached :upload
   
   COLORS    =  ["#3398dc", "#6639b6", "#e64b3b", "#72c02c", "#ebc71d", "#ed4a82", "#b09980", "#22e3be", "#fe541e", "#00BB27", "#4000FF"]
