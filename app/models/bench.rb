@@ -38,12 +38,15 @@ class Bench < ApplicationRecord
     require 'csv'
     parsed = CSV.parse(upload.attachment.download)
     length = parsed.count
+    inputs = [
       parsed.each_with_index do |parse, i|
-        Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(bench_id: self.id, game_id: game_id).last.id,
+        Input.new(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(bench_id: self.id, game_id: game_id).last.id,
                       type_id: type_id, fps: parse[1], frametime: (1000 / parse[1].to_f).round(2),
                       cpu: parse[2].to_f, gpu: parse[2].to_i, color: color, pos: parse[3], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 100 == 0
-    end
+      end
+    ]
+    Input.import inputs;
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json(benches_game)
     # self.refresh_json_api
@@ -98,20 +101,22 @@ class Bench < ApplicationRecord
     count = 0
     length = parsed.count
     threads = []
+    inputs = []
       parsed.each_with_index do |parse, i|
-          threads << Thread.new {
-          Input.create!(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
+          # threads << Thread.new {
+          input = Input.new(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(game_id: game_id, bench_id: self.id).last.id,
                         type_id: type_id, fps: parse[0], frametime: parse[1].to_f / 1000, cpu: parse[2], gpu: parse[3],
                         color: color, pos: parse[10], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
-          }
-          if threads.count > 3
-            threads.each {|thr| thr.join}
-            threads = []
-          end
+          inputs.push(input)
+          # }
+          # if threads.count > 3
+            # threads.each {|thr| thr.join}
+            # threads = []
+          # end
           ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
-    end
+      end
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
-    self.refresh_json
+    self.refresh_json(benches_game)
     # self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end

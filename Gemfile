@@ -3,6 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.6.4'
 
+gem 'activerecord-import'
 gem 'browser'
 gem 'will_paginate-bootstrap'
 gem 'will_paginate', '~> 3.1.0'
