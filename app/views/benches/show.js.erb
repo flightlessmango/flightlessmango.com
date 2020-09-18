@@ -1,11 +1,11 @@
 <% benches_game = BenchesGame.where(game_id: params[:game], bench_id: @benchmark.id).last %>
 <% if params[:type] == "full" %>
     <% if params[:game] != "total" %>
-        <% if browser.device.mobile? %>
-            $('#gameContent').html("<%= j render partial: 'benches/graphs_mobile', locals: {benches_game: benches_game} %>")
-        <% else %>
+        <%# if browser.device.mobile? %>
+            //$('#gameContent').html("<%#= j render partial: 'benches/graphs_mobile', locals: {benches_game: benches_game} %>")
+        <%# else %>
             $('#gameContent').html("<%= j render partial: 'benches/graphs', locals: {benches_game: benches_game} %>")
-        <% end %>
+        <%# end %>
     <% else %>
         $('#gameContent').html("<%= j render partial: 'benches/total_graphs', locals: {benchmark: @benchmark} %>")
     <% end %>
