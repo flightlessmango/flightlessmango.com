@@ -45,8 +45,8 @@ class Bench < ApplicationRecord
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 100 == 0
     end
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
-    self.refresh_json
-    self.refresh_json_api
+    self.refresh_json(benches_game)
+    # self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
   
@@ -88,7 +88,7 @@ class Bench < ApplicationRecord
     end
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json
-    self.refresh_json_api
+    # self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
   
@@ -112,7 +112,7 @@ class Bench < ApplicationRecord
     end
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json
-    self.refresh_json_api
+    # self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
 
@@ -147,18 +147,15 @@ class Bench < ApplicationRecord
     end
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json
-    self.refresh_json_api
+    # self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
   
-  def refresh_json
+  def refresh_json(benches_game)
     Input.where(fps: 0).delete_all
     onepercent = {}
     percentile97 = {}
     self.inputs.where(fps: nil).delete_all
-    self.games.each do |game|
-
-      benches_game = BenchesGame.where(game_id: game.id, bench_id: self.id).last
       fps_chart = benches_game.types.order(:name).map { |type|
         {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(
         id: type.inputs.map {|input| input if input.pos.to_i % 100 == 0 }.compact.pluck(:id)).group(:pos).average(:fps),
@@ -177,7 +174,6 @@ class Bench < ApplicationRecord
         pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id)
         onepercent.store(type.name, typeInputs.where(id: pluck).average(:fps))
         percentile97.store(type.name, Bench.percentile(typeInputs.pluck(:fps).sort, 0.97))
-      end
       bar_chart = [
               {
                 name: '1% Min',
