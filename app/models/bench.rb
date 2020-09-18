@@ -46,7 +46,6 @@ class Bench < ApplicationRecord
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 100 == 0
       end
     ]
-    Input.import inputs;
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json(benches_game)
     # self.refresh_json_api
@@ -115,6 +114,7 @@ class Bench < ApplicationRecord
           # end
           ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
       end
+    Input.import inputs;
     benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json(benches_game)
     # self.refresh_json_api
