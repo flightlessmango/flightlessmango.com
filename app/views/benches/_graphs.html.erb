@@ -239,10 +239,10 @@ function fps_chart(){
 
 function frametime_chart(){
   var data = []
-  <% @benchmark.types.order(name: :desc).each do |type| %>
+  <% benches_game.types.order(name: :desc).each do |type| %>
     window["trace-<%= type.id %>"] = {
-      x: <%= type.inputs.where(bench: @benchmark).order(pos: :asc).pluck(:pos) %>,
-      y: <%=  type.inputs.where(bench: @benchmark).order(pos: :asc).pluck(:frametime) %>,
+      x: <%= benches_game.inputs.where(type: type).order(pos: :asc).pluck(:pos) %>,
+      y: <%= benches_game.inputs.where(type: type).order(pos: :asc).pluck(:frametime) %>,
       mode: 'lines',
       line: {
         color: '<%= type.inputs.where(bench: @benchmark).last.color %>',
