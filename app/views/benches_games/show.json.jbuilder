@@ -4,11 +4,17 @@ json.data @benches_game.types.order(:name) do |type|
     end
     json.mode "lines"
     json.name type.name
-    json.x type.inputs.where(benches_game_id: @benches_game.id).order(:pos).pluck(:pos)
-    if @graph_type == "fps"
-        json.y type.inputs.where(benches_game_id: @benches_game.id).order(:pos).pluck(:fps)
+    @inputs = []
+    if params[:size] == "full"
+        @inputs = type.inputs.where(benches_game_id: @benches_game.id).order(:pos)
     else
-        json.y type.inputs.where(benches_game_id: @benches_game.id).order(:pos).pluck(:frametime)
+        @inputs = type.inputs.where(benches_game_id: @benches_game.id).order(:pos).map {|input| input if input.id.to_i % 50 == 0 }.compact
+    end
+    json.x @inputs.pluck(:pos)
+    if @graph_type == "fps"
+        json.y @inputs.pluck(:fps)
+    else
+        json.y @inputs.pluck(:frametime)
     end
 end
 json.layout do
@@ -26,7 +32,7 @@ json.layout do
         json.text @graph_type.upcase!
         json.xanchor "center"
     end
-    json.hovermode true
+    json.hovermode false
     json.responsive true
     json.legend do
         json.xanchor "center"
@@ -37,7 +43,9 @@ json.layout do
     end
     json.font do
         json.font 'lato, sans-serif'
-        json.size 18
+        if params[:size] == "mini"
+            json.size 10
+        end
         json.color '#E0E0E3'
     end
     json.plot_bgcolor "rgba(1,1,1,0)"
@@ -49,6 +57,11 @@ json.layout do
         json.showticklabels false
     end
     json.yaxis do
+        if params[:graph_type] == "FPS"
+            json.range [@benches_game.min, @benches_game.max]
+        else
+            json.range [0, 1000 / @benches_game.min]
+        end
         json.tickfont do
             json.color "#E0E0E3"
         end
