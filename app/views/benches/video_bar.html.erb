@@ -1,3 +1,4 @@
+<button id="hide" onclick="hide()">Hide</button> 
 <style media="screen">
   body{
     padding-top: 50px;
@@ -9,7 +10,7 @@
 <nav id="gameSelect">
   <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
     <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
-        <a class="nav-item nav-link <% if i == 0 %> active <% end %>" id="nav-game-tab-<%= game.id %>" data-toggle="tab" href="#nav-game-<%= game.id %>" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
+        <a class="nav-item nav-link <% if i == 0 %> active <% end %>" onclick="" data-remote="true" id="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=<%= game.id %>&type=full" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
     <% end %>
     <a class="nav-item nav-link" id="nav-game-tab-total" data-toggle="tab" href="#nav-game-total" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
   </div>
@@ -77,12 +78,14 @@
 </script>
 <h1 class="text-center"><%= @benchmark.name %></h1>
 <% if @benchmark.games.count > 1 %>
-<h3 class="text-center" id="gameName"><%= @benchmark.inputs.last.game.name %></h3>
+<h3 class="text-center" id="gameTitle"><%= @benchmark.inputs.last.game.name %></h3>
 <% end %>
-<%= bar_chart bar_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id,
- bench_id: @benchmark.id).last.id), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Max/Avg', id: 'bar', ytitle: "FPS", library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px' %> 
-<%= render partial: 'stats', locals: {types: BenchesGame.where(bench_id: @benchmark.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id).first.id} %>
-<button id="hide" onclick="hide()">Hide</button> 
+<%#= bar_chart bar_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id,
+ bench_id: @benchmark.id).last.id), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Max/Avg', id: 'bar', ytitle: "FPS", library: {plotOptions: { column: { colorByPoint: true}},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px' %> 
+<div id='bar_chart'></div>
+<div id="gameStats">
+  <%= render partial: 'stats', locals: {types: BenchesGame.where(bench_id: @benchmark.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id).first.id} %>
+</div>
 <script type="text/javascript">
   function hide(){
     $('.highcharts-button-symbol').hide()

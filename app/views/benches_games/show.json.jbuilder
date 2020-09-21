@@ -50,13 +50,13 @@ if @graph_type == "bar"
             json.zeroline true
             json.gridcolor "#707073"
         end
-        json.legend do
-            json.xanchor "center"
-            json.x 0.5
-            json.y -0.2
-            json.yanchor "bottom"
-            json.orientation "h"
-        end
+        # json.legend do
+        #     json.xanchor "left"
+        #     json.x 0
+        #     json.y 0
+        #     json.yanchor "bottom"
+        #     json.orientation "v"
+        # end
     end
 end
 if @graph_type == "frametime" || @graph_type == "fps"

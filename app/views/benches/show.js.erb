@@ -40,6 +40,7 @@
         $.getJSON('<%= totalbar_bench_path(@benchmark) %>' + '.json', function(data) {
             Plotly.react('bar_chart', data);
         })
+        $("#gameStats").html("<%= j render partial: 'stats_total', locals: {types: @benchmark.types} %>")
         $('#gameTitle').html("Total")
         $("#fps_chart").hide()
         $("#frametime_chart").hide()

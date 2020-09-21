@@ -9,7 +9,7 @@
 <nav id="gameSelect">
   <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
     <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
-        <a class="nav-item nav-link <% if i == 0 %> active <% end %>" id="nav-game-tab-<%= game.id %>" data-toggle="tab" href="#nav-game-<%= game.id %>" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
+        <a class="nav-item nav-link <% if i == 0 %> active <% end %>" onclick="" data-remote="true" id="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=<%= game.id %>&type=full" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
     <% end %>
     <a class="nav-item nav-link" id="nav-game-tab-total" data-toggle="tab" href="#nav-game-total" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
   </div>
@@ -82,13 +82,14 @@
 <% if @benchmark.games.count > 1 %>
 <h3 class="text-center" id="gameName"><%= @benchmark.inputs.last.game.name %></h3>
 <% end %>
-<%= line_chart full_fps_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
+<%#= line_chart full_fps_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
    points: false, curve: false, download: false, title: 'FPS', id: 'fps', xtitle: "Time", ytitle: "FPS",
    library: {xAxis: {labels: { enabled: false }}, yAxis: {min: @benchmark.inputs.minimum(:fps)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-up" style="color: #00bc8c"></i> More is better'}}, height: '400px' %>
-<%= line_chart full_frametime_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
+<%#= line_chart full_frametime_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
    points: false, curve: false, download: false, title: 'Frame Time', id: 'frametime', xtitle: "Time", ytitle: "Ms",
     library: {xAxis: {labels: { enabled: false }}, yAxis: {min: @benchmark.inputs.minimum(:frametime)},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-down" style="color: #00bc8c"></i> Less is better'}}, height: '400px'  %>
-
+    <div id='fps_chart'></div>
+    <div id='frametime_chart'></div>
     
 <script type="text/javascript">
   function hide(){

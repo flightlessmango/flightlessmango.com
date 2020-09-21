@@ -43,13 +43,6 @@ if params[:type] == "total"
             json.zeroline true
             json.gridcolor "#707073"
         end
-        json.legend do
-            json.xanchor "center"
-            json.x 0.5
-            json.y -0.2
-            json.yanchor "bottom"
-            json.orientation "h"
-        end
         json.margin do 
             json.l 150
         end

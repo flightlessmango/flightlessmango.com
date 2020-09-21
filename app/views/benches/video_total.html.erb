@@ -1,3 +1,4 @@
+<button id="hide" onclick="hide()">Hide</button> 
 <style media="screen">
   body{
     padding-top: 100px;
@@ -7,11 +8,11 @@
 </style>
 <h1 class="text-center"><%= @benchmark.name %></h1>
 <h3 class="text-center">Total</h3><br>
-<%= bar_chart totalbar_bench_path(@benchmark), colors: Bench::TWENTY, title: 'Average', ytitle: "FPS",
+<%#= bar_chart totalbar_bench_path(@benchmark), colors: Bench::TWENTY, title: 'Average', ytitle: "FPS",
 library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'},
 plotOptions: { series: { grouping: false}, column: { colorByPoint: true }}, xAxis: {visible: true }, tooltip: { headerFormat: ""}}, height: '500px', stacked: false %>
+<div id="bar_chart"></div>
 <%= render partial: 'benches/stats_total', locals: {types: BenchesGame.where(bench_id: @benchmark.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id).first.id} %>
-<button id="hide" onclick="hide()">Hide</button> 
 <script type="text/javascript">
   function hide(){
     $('.highcharts-button-symbol').hide()
@@ -32,4 +33,7 @@ plotOptions: { series: { grouping: false}, column: { colorByPoint: true }}, xAxi
       await sleep(2500)
     }
   }
+  $.getJSON('<%= totalbar_bench_path(@benchmark) %>' + '.json', function(data) {
+    Plotly.newPlot('bar_chart', data);
+  })
 </script>
