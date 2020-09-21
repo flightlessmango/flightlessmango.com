@@ -11,7 +11,11 @@
 <a class="btn btn-lg btn-primary float-right" href="https://www.youtube.com/watch?v=<%= @benchmark.youtubeid %>" role="button" style="background-color: #cc0000;" id="youtubeButton"><strong>Youtube</strong></a>
 <br><br>
 <h2 style="text-align: center;"><%= @benchmark.name %></h2>
-<h6 style="text-align: center;">Data without recording</h6>
+<%
+=begin%>
+ <h6 style="text-align: center;">Data without recording</h6> 
+<%
+=end%>
 <br>
 <% unless @benchmark.inputs.empty? %>
   <% if @benchmark.apis.count > 1 %>
@@ -21,9 +25,9 @@
   <nav>
     <div class="nav nav-pills nav-justified" id="nav-tab" role="tablist">
       <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
-      <a class="nav-item nav-link <% if i == 0 %> active <% end %>" onclick="hideContent()" data-remote="true" id="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=<%= game.id %>&type=full" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
+      <a class="nav-item nav-link <% if i == 0 %> active <% end %>" onclick="" data-remote="true" id="nav-game-tab-<%= game.id %>-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=<%= game.id %>&type=full" role="tab" aria-controls="nav-home" aria-selected="true"><%= game.name %></a>
       <% end %>
-      <a class="nav-item nav-link" onclick="hideContent()" data-remote="true" id="nav-game-tab-total-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=total&type=full" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
+      <a class="nav-item nav-link" onclick="" data-remote="true" id="nav-game-tab-total-bench-<%= @benchmark.id %>" data-toggle="tab" href="<%= bench_path(@benchmark) %>?game=total&type=full" role="tab" aria-controls="nav-home" aria-selected="true">Total</a>
     </div>
   </nav>
   <div class="tab-content" id="pills-tabContent" style="padding: 25px 0px 0px;">

@@ -172,6 +172,7 @@ class Bench < ApplicationRecord
     fps_chart = {}
     frametime_chart = {}
     bar_chart = {}
+    totalbar_chart = {}
       # fps_chart = benches_game.types.order(:name).map { |type|
       #   {name: type.name, data: type.inputs.where(benches_game_id: benches_game.id).where(bench_id: self.id).where(
       #   id: type.inputs.map {|input| input if input.pos.to_i % 100 == 0 }.compact.pluck(:id)).group(:pos).average(:fps),
@@ -214,19 +215,23 @@ class Bench < ApplicationRecord
       else
         http_protocol = "https"
       end
-      ["fps", "frametime"].each do |graph_type|
+      ["fps", "frametime", "bar"].each do |graph_type|
         ["full", "mini"].each do |size|
           url = url_for(action: 'show', controller: 'benches_games', only_path: false, protocol: http_protocol, id: benches_game.id, :format => :json, :graph_type => graph_type, :size => size)
           uri = URI(url)
           response = Net::HTTP.get(uri)
-          puts url
+          # puts url
+          if graph_type == "bar" && size == "full"
+            bar_chart = response
+          end
           if graph_type == "fps"
             if size == "full"
               full_fps_chart = response
             else
               fps_chart = response
             end
-          else
+          end
+          if graph_type == "frametime"
             if size == "full"
               full_frametime_chart = response
             else
@@ -238,13 +243,18 @@ class Bench < ApplicationRecord
 
       # avgcpu_chart = self.inputs.where(bench: self).joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
       benches_game.update(full_fps: full_fps_chart, full_frametime: full_frametime_chart, frametime: frametime_chart, fps: fps_chart,
-                          bar: bar_chart.chart_json,min: benches_game.inputs.minimum(:fps),
+                          bar: bar_chart, min: benches_game.inputs.minimum(:fps),
                           max: benches_game.inputs.maximum(:fps))
     if self.games.count > 1
-      totalbar_chart = self.types.order(name: :asc).map {|type| {name: type.name, data: type.inputs.joins(:type).where(bench: self).group('types.name').average(:fps)}}
+      url = url_for(action: 'show', controller: 'benches', only_path: false, protocol: http_protocol, id: benches_game.bench.id, :format => :json, :type => "total")
+      uri = URI(url)
+      response = Net::HTTP.get(uri)
+      totalbar_chart = response
       totalcpu_chart = self.inputs.where(bench: self).joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
-      self.update(totalbar: totalbar_chart.chart_json, totalcpu: totalcpu_chart)
+      self.update(totalbar: totalbar_chart, totalcpu: totalcpu_chart)
+      puts url
     end
+    ActionCable.server.broadcast 'web_notifications_channel', "reload"
   end
 
   def refresh_json_api
@@ -319,6 +329,22 @@ class Bench < ApplicationRecord
     data = JSON.load(open(url))
     self.update(description: data["items"][0]["snippet"]["description"])
   end
+
+  def type_avg
+    array = []
+    self.types.order(:name).each do |type|
+      array.push(type.inputs.where(bench: self).average(:fps).to_i)
+    end
+    return array
+  end
   
+  def type_colors
+    array = []
+    self.types.order(name: :desc).each do |type|
+      array.push(type.inputs.last.color)
+    end
+    return array
+  end
+
 end
 

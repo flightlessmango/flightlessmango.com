@@ -1,13 +1,51 @@
 <% benches_game = BenchesGame.where(game_id: params[:game], bench_id: @benchmark.id).last %>
 <% if params[:type] == "full" %>
     <% if params[:game] != "total" %>
-        <%# if browser.device.mobile? %>
-            //$('#gameContent').html("<%#= j render partial: 'benches/graphs_mobile', locals: {benches_game: benches_game} %>")
-        <%# else %>
-            $('#gameContent').html("<%= j render partial: 'benches/graphs', locals: {benches_game: benches_game} %>")
-        <%# end %>
+            $('#gameTitle').html("<%= benches_game.game.name %>")
+        <% if browser.device.mobile? %>
+            $.getJSON('<%= fps_benches_game_path(benches_game) %>' + '.json', function(data) {
+                Plotly.react('fps_chart', data);
+            })
+            Plotly.setPlotConfig({
+                displayModeBar: false
+            });
+            $.getJSON('<%= frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
+                Plotly.react('frametime_chart', data);
+            })
+            Plotly.setPlotConfig({
+                displayModeBar: false
+            });
+            $.getJSON('<%= bar_benches_game_path(benches_game) %>' + '.json', function(data) {
+                Plotly.react('bar_chart', data);
+            })
+            Plotly.setPlotConfig({
+                displayModeBar: false
+            });
+        <% else %>
+            $.getJSON('<%= full_frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
+                Plotly.react('frametime_chart', data);
+            })
+            $.getJSON('<%= full_fps_benches_game_path(benches_game) %>' + '.json', function(data) {
+                Plotly.react('fps_chart', data);
+            })
+            $.getJSON('<%= bar_benches_game_path(benches_game) %>' + '.json', function(data) {
+                Plotly.react('bar_chart', data);
+            })
+        <% end %>
+        $("#fps_chart").show()
+        $("#frametime_chart").show()
+        $("#gameStats").html("<%= j render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>")
     <% else %>
-        $('#gameContent').html("<%= j render partial: 'benches/total_graphs', locals: {benchmark: @benchmark} %>")
+        //$('#gameContent').html("<%#= j render partial: 'benches/total_graphs', locals: {benchmark: @benchmark} %>")
+        $.getJSON('<%= totalbar_bench_path(@benchmark) %>' + '.json', function(data) {
+            Plotly.react('bar_chart', data);
+        })
+        $('#gameTitle').html("Total")
+        $("#fps_chart").hide()
+        $("#frametime_chart").hide()
+
+
+
     <% end %>
 <% end %>
 

@@ -84,6 +84,6 @@ end
   private
   # Never trust parameters from the scary internet, only allow the white list through.
   def benches_game_params
-    params.permit(:game_id, :bench_id)
+    params.require(:benches_game).permit(:game_id, :bench_id)
   end
 end

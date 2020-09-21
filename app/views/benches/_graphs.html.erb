@@ -4,6 +4,7 @@
   <% if @benchmark.id > 44 %>
     <div id='fps_chart'></div>
     <div id='frametime_chart'></div>
+    <div id='bar_chart'></div>
   <% else %>
     <%= line_chart full_fps_benches_game_path(benches_game),
       points: false, curve: false, download: true, title: 'FPS', xtitle: "Time", ytitle: "FPS",
@@ -16,7 +17,7 @@
     <% end %>
   <% end %>
 
-  <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
+  <%#= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
     library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
 
 
@@ -201,11 +202,14 @@ function frametime_chart(){
 function resize_charts(){
   Plotly.relayout('fps_chart', resize_plotly())
   Plotly.relayout('frametime_chart', resize_plotly())
+  Plotly.relayout('bar_chart', resize_plotly())
 }
 $( document ).ready(function() {
   fps_chart();
   frametime_chart();
+  $.getJSON('<%= bar_benches_game_path(benches_game) %>' + '.json', function(data) {
+    Plotly.newPlot('bar_chart', data);
+  })
   window.addEventListener('resize', resize_charts);
 })
-// })
 </script>

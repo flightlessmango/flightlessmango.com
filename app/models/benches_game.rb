@@ -20,5 +20,33 @@ class BenchesGame < ApplicationRecord
             }
           ]
     end
+    def one_array
+      array = []
+      self.types.order(name: :desc).each do |type|
+        array.push(type.onepercent(self))
+      end
+      return array
+    end 
+
+    def avg_array
+      array = []
+      self.types.order(name: :desc).each do |type|
+        ##array.push(type.avg(self) - type.onepercent(self))
+        array.push(type.avg(self))
+      end
+      return array
+    end     
     
+    def ninety_array
+      array = []
+      self.types.order(name: :desc).each do |type|
+        #array.push(type.ninetyseven(self) - (type.onepercent(self) + (type.avg(self) - type.onepercent(self)) ))
+        array.push(type.ninetyseven(self))
+      end
+      return array
+    end
+
+    def names
+      self.types.order(name: :desc).pluck(:name)  
+    end
 end
