@@ -80,7 +80,7 @@
 <button id="hide" onclick="hide()">Hide</button> 
 <h1 class="text-center"><%= @benchmark.name %></h1>
 <% if @benchmark.games.count > 1 %>
-<h3 class="text-center" id="gameName"><%= @benchmark.inputs.last.game.name %></h3>
+<h3 class="text-center" id="gameTitle"><%= @benchmark.inputs.last.game.name %></h3>
 <% end %>
 <%#= line_chart full_fps_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last.id),
    points: false, curve: false, download: false, title: 'FPS', id: 'fps', xtitle: "Time", ytitle: "FPS",
