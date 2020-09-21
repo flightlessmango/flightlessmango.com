@@ -50,6 +50,7 @@ if @graph_type == "bar"
             json.zeroline true
             json.gridcolor "#707073"
         end
+        json.height 400
         # json.legend do
         #     json.xanchor "left"
         #     json.x 0
@@ -134,5 +135,6 @@ if @graph_type == "frametime" || @graph_type == "fps"
             json.zeroline true
             json.gridcolor "#707073"
         end
+        json.height 400
     end
 end

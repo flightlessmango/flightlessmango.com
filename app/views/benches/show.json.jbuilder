@@ -46,6 +46,7 @@ if params[:type] == "total"
         json.margin do 
             json.l 150
         end
+        json.height 400
     end
 else
     json.array! @benchmark.games.order(id: :asc) do |game|
