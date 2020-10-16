@@ -8,7 +8,7 @@
   </button>
 <% end %>
 
-<a class="btn btn-lg btn-primary float-right" href="https://www.youtube.com/watch?v=<%= @benchmark.youtubeid %>" role="button" style="background-color: #cc0000;" id="youtubeButton"><strong>Youtube</strong></a>
+<a class="btn btn-lg btn-primary float-right" href="https://www.youtube.com/watch?v=<%= @benchmark.youtubeid.gsub("-part2", "") %>" role="button" style="background-color: #cc0000;" id="youtubeButton"><strong>Youtube</strong></a>
 <br><br>
 <h2 style="text-align: center;"><%= @benchmark.name %></h2>
 <%
