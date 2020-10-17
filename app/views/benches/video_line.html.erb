@@ -24,6 +24,10 @@
     <h3 class="text-center">Total</h3>
   </div>
 </div>
+<% else %>
+<script>
+  $.getScript( "<%= bench_path(@benchmark) %>?game=<%= @benchmark.games.last.id %>&type=full")
+</script>
 <% end %>
 <script type="text/javascript">
   $('#spider').hide()
