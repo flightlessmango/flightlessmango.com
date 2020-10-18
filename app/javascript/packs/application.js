@@ -11,19 +11,12 @@ require("bootstrap")
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
-require("chartkick").use(require("highcharts"))
-import Highcharts from 'highcharts';
-addExporting(Highcharts)
-window.Highcharts = Highcharts;
-import addExporting from "highcharts/modules/exporting";
-import addBoost from "highcharts/modules/boost";
-import '../stylesheets/application'
-import toastr from 'toastr';
-import '../stylesheets/colorPick'
-require("packs/highcharts-custom.js")
 require("packs/colorPick.js")
 require("packs/custom.js")
 require("packs/google_analytics.js.erb")
+import '../stylesheets/application'
+import toastr from 'toastr';
+import '../stylesheets/colorPick'
 
 toastr.options = {
     "closeButton": true
