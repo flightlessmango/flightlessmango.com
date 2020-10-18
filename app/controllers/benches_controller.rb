@@ -4,7 +4,11 @@ class BenchesController < ApplicationController
     if user_signed_in? && current_user.admin?
       @benchmarks = Bench.all.paginate(page: params[:page], per_page: 15)
     else
-      @benchmarks = Bench.where(published: true).paginate(page: params[:page], per_page: 15)
+      if browser.device.mobile?
+        @benchmarks = Bench.where(published: true).paginate(page: params[:page], per_page: 5)
+      else
+        @benchmarks = Bench.where(published: true).paginate(page: params[:page], per_page: 15)
+      end
     end
   end
   
