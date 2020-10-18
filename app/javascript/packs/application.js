@@ -5,18 +5,18 @@
 
 require("jquery")
 require("@rails/ujs").start()
-require("popper.js")
-import popper from 'popper.js'
+// require("popper.js")
+// import popper from 'popper.js'
 window.jQuery = $;
 window.$ = $;
-window.Popper = require('popper.js');
+// window.Popper = require('popper.js');
 window.popper = require('popper.js');
 require("bootstrap")
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
 require("chartkick").use(require("highcharts"))
-require("chart.js")
+// require("chart.js")
 import Highcharts from 'highcharts';
 addExporting(Highcharts)
 window.Highcharts = Highcharts;
@@ -29,14 +29,14 @@ require("packs/highcharts-custom.js")
 require("packs/colorPick.js")
 require("packs/custom.js")
 require("packs/google_analytics.js.erb")
-import '@fortawesome/fontawesome-free/js/fontawesome'
-import '@fortawesome/fontawesome-free/js/solid'
-import '@fortawesome/fontawesome-free/js/regular'
-import '@fortawesome/fontawesome-free/js/brands'
-import moment from 'moment'
-import 'chartjs-plugin-streaming'
-require('chosen-js')
-require('chosen-js/chosen.css')
+// import '@fortawesome/fontawesome-free/js/fontawesome'
+// import '@fortawesome/fontawesome-free/js/solid'
+// import '@fortawesome/fontawesome-free/js/regular'
+// import '@fortawesome/fontawesome-free/js/brands'
+// import moment from 'moment'
+// import 'chartjs-plugin-streaming'
+// require('chosen-js')
+// require('chosen-js/chosen.css')
 
 
 window.moment = moment
