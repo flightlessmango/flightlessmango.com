@@ -5,7 +5,10 @@
     <title>FlightlessMango</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%#= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%#= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= render 'layouts/google_analytics' %>
+    <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'charts', 'data-turbolinks-track': 'reload' if params[:action] == "show" %>
     <%= javascript_include_tag 'https://cdn.plot.ly/plotly-basic-1.57.0.min.js', 'data-turbolinks-track': 'reload'  if params[:action] == "show" %>
