@@ -2,7 +2,7 @@
     <% benchmarks.order(created_at: :desc).each do |bench| %>
     <div class="col-12 col-sm-6 col-md-6 col-lg-6 col-xl-4 my-3 ">
       <%= link_to bench do %>
-        <%= image_tag "https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/maxresdefault.jpg", class: 'img-fluid' %>
+        <%= image_tag "https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/mqdefault.jpg", class: 'img-fluid' %>
       <% end %>
       <br>
       <h6 class="text-center"><%= bench.name %></h6>
