@@ -332,10 +332,16 @@ class Bench < ApplicationRecord
 
   def type_avg
     array = []
-    self.types.order(:name).each do |type|
+    self.types.order(name: :desc).each do |type|
       array.push(type.inputs.where(bench: self).average(:fps).to_i)
     end
     return array
+  end
+
+  def refresh_all
+    self.benches_games.each do |game|
+        self.refresh_json(game)
+    end
   end
   
   def type_colors
