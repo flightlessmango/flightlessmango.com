@@ -6,7 +6,7 @@
       <div class="">
       <% if game.steamid.nil? %>
         <div style="background-color:black; padding: 2.5%;"></div>
-          <%= link_to image_tag("https://lutris.net" + game.image_url, class: 'card-img-top'), game_path(game) %>
+          <%= link_to image_tag(game.image_url, class: 'card-img-top'), game_path(game) %>
         <div style="background-color:black; padding: 2.5%;"></div>
       <% else %>
         <%= link_to image_tag("https://steamcdn-a.akamaihd.net/steam/apps/" + game.steamid.to_s + "/header.jpg", class: 'card-img-top'), game_path(game) %>
