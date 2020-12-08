@@ -24,7 +24,7 @@
             <td><%= upload.onepercent.to_i %></td>
             <!-- <td><%#= upload.max.to_i %></td> -->
             <td><%= upload.avg.to_i %></td>
-            <td><%= upload.percentile97 %></td>
+            <td><%= upload.percentile97.to_i %></td>
             <td>
               <% if @log.uploads.blobs.where(id: @log.compare_to).any? %>
                 <%= (upload.avg / @log.uploads.blobs.where(id: @log.compare_to).first.attachments.first.avg * 100).round(2)%>
