@@ -18,6 +18,17 @@
           <%#= f.select :game_id, options_from_collection_for_select(Game.all.order(name: :asc), "id", "name", @game.id), {}, { class: 'form-control chosen-container chosen-container-single chosen-select'} %>
         </div>
     </div>
+    <div class="row">
+  <div class="col-3">
+    Title
+    <%= f.text_field :title, class: 'form-control' %>
+  </div>
+  <div class="col-3"></div>
+  <div class="col-4">
+    Description
+    <%= f.text_area :text, class: 'form-control' %>
+  </div>
+</div>
       <br>
     <div class="row">
       <div class="col-6">
@@ -36,11 +47,11 @@
       $('#submit').prop('disabled', false)
     }
   }
-  <% if @log.uploads.empty? %>
-    hasFile("#log_uploads")
-    $("#log_uploads").change(function(){
-      console.log('Uploads changed')
-      hasFile(this);
-    })
-  <% end %>
+  // <%# if @log.uploads.empty? %>
+  //   hasFile("#log_uploads")
+  //   $("#log_uploads").change(function(){
+  //     console.log('Uploads changed')
+  //     hasFile(this);
+  //   })
+  // <%# end %>
 </script>
