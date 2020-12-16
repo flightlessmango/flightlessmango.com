@@ -204,3 +204,8 @@ a:hover {
   /* right: -50; */
   
 }
+
+.card-bottom {
+  position: relative;
+  top: 80%;
+}

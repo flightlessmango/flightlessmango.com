@@ -63,6 +63,6 @@ Rails.application.routes.draw do
     end
   end
   
-  root 'benches#index'
+  root 'welcome#index'
   
 end

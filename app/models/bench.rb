@@ -352,5 +352,10 @@ class Bench < ApplicationRecord
     return array
   end
 
+  def publish
+    @benchmark = Bench.friendly.find(self.id)
+    @benchmark.update(published: true)
+    @benchmark.get_desc
+  end
 end
 

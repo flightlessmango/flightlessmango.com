@@ -1,0 +1,66 @@
+<div class="row">
+  <div class="col-xl-8 col-lg-8 col-md-12">
+  <h3>Latest FlightlessMango Benchmarks</h3>
+    <% @benchmarks.order(created_at: :desc).limit(10).each do |bench| %>
+      <div class="d-block d-lg-none">
+        <%= link_to image_tag("https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/maxresdefault.jpg", class: "img-fluid card-img-top"), bench %>
+        <div class="card-body" style="background-color: #303030">
+        <div class="row">
+          <div class="col-8">
+            <h4 class="card-title"><%= link_to bench.name.truncate(45), bench %></h4>
+            <%= bench.text %>
+          </div>
+          <br>
+          <div class="col-4">
+            <div class="col-5 float-right">
+              <strong><%=link_to User.first.username, games_path %></strong>
+            </div>
+            <br>
+            <div class="col-5 float-right">
+              <small class="text-muted"><%= time_ago_in_words(bench.created_at) %> ago</small>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="card d-none d-lg-block">
+        <div class="row">
+          <div class="col-5">
+            <%= link_to image_tag("https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/mqdefault.jpg", class: "img-fluid card-img-top"), bench %>
+          </div>
+          <div class="col-7 d-none d-lg-block">
+            <div class="card-block ml-n4 px-1">
+              <h4 class="card-title"><%= link_to bench.name, bench %></h4>
+              <div style="height: 40px; overflow: hidden;">Hey my name is Dony and I didn't make this, but this is a sample text</div>
+              
+              <div class="d-none d-xl-block"> <br></div>
+              <div class="d-none d-lg-block d-xl-none"> </div>
+              <div class="row d-flex flex-column align-items-end">
+                <div class="col-12">
+                  <strong><%=link_to User.first.username, games_path %></strong><small class="text-muted float-right"><%= time_ago_in_words(bench.created_at) %> ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-4 d-none d-lg-block">
+    <h5>Latest User Benchmarks</h5>
+    <% @user_benchmarks.where.not(title: NIL).order(created_at: :desc).limit(5).each do |bench| %>
+      <div class="card" style="">
+        <% if bench.game.steamid.nil? %>
+            <%= link_to image_tag(bench.game.image_url.to_s, class: 'card-img-top'), bench %>
+        <% else %>
+          <%= link_to image_tag("https://steamcdn-a.akamaihd.net/steam/apps/" + bench.game.steamid.to_s + "/header.jpg", class: 'card-img-top'), bench %>
+        <% end %>
+        <div class="card-body">
+          <h5 class="card-title"><%= link_to bench.title, bench %></h5>
+          <p class="card-text"><%= bench.text.truncate(100) %></p>
+          <strong><%=link_to bench.user.username, bench.user %></strong><small class="text-muted float-right"><%= time_ago_in_words(bench.created_at) %> ago</small>
+          </div>
+      </div>
+    <% end %>
+  </div>
+</div>
