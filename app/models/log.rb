@@ -71,7 +71,7 @@ class Log < ApplicationRecord
             # 5.times do
             if is_float?(parse[fps_row])
               data_fps.push([count, parse[fps_row]])
-              data_fps.push([count, parse[cpu_row]])
+              data_cpu.push([count, parse[cpu_row]])
               data_fps_only.push(parse[fps_row].to_i)
               data_frametime.push([count, (1000 / parse[fps_row].to_f).round(2)])
               count += 1
