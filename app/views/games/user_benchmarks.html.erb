@@ -9,6 +9,7 @@
 <div class="row">
   <div class="col-12">
       <%= f.submit "Search", class: "btn btn-mango"%>
+      <%= link_to 'Sort by logs', sort_url(@q, :num_logs), class: "btn btn-mango" %>
   </div>
 </div>
 <br>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_16_051017) do
+ActiveRecord::Schema.define(version: 2020_12_18_121822) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -129,6 +129,7 @@ ActiveRecord::Schema.define(version: 2020_12_16_051017) do
     t.string "slug"
     t.string "steam_type"
     t.integer "lutris_id"
+    t.integer "num_logs"
     t.index ["slug"], name: "index_games_on_slug", unique: true
   end
 

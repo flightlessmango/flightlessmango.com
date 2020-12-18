@@ -52,6 +52,7 @@ class LogsController < ApplicationController
 
       end
     end
+    @game.update(num_logs: @game.logs.count)
   end
   
   def update
@@ -82,7 +83,7 @@ end
 def destroy
   @log = Log.find(params[:id])
   @log.destroy
- 
+  @log.game.update(num_logs: @game.logs.count)
   redirect_to user_path(current_user)
 end
 
