@@ -6,17 +6,17 @@
         <%= link_to image_tag("https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/maxresdefault.jpg", class: "img-fluid card-img-top"), bench %>
         <div class="card-body" style="background-color: #303030">
         <div class="row">
-          <div class="col-8">
+          <div class="col-6">
             <h4 class="card-title"><%= link_to bench.name.truncate(45), bench %></h4>
             <%= bench.text %>
           </div>
           <br>
-          <div class="col-4">
-            <div class="col-5 float-right">
+          <div class="col-6">
+            <div class="col-6 float-right">
               <strong><%=link_to User.first.username, games_path %></strong>
             </div>
             <br>
-            <div class="col-5 float-right">
+            <div class="col-6 float-right">
               <small class="text-muted"><%= time_ago_in_words(bench.created_at) %> ago</small>
             </div>
           </div>
