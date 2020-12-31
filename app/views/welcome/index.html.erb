@@ -6,27 +6,23 @@
         <%= link_to image_tag("https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/maxresdefault.jpg", class: "img-fluid card-img-top"), bench %>
         <div class="card-body" style="background-color: #303030">
         <div class="row">
-          <div class="col-6">
+          <div class="col-11">
             <h4 class="card-title"><%= link_to bench.name.truncate(45), bench %></h4>
-            <%= bench.text %>
+            <div style="height: 40px;"><%= bench.text %></div>
           </div>
           <br>
-          <div class="col-6">
-            <div class="col-6 float-right">
-              <strong><%=link_to User.first.username, games_path %></strong>
-            </div>
-            <br>
-            <div class="col-6 float-right">
-              <small class="text-muted"><%= time_ago_in_words(bench.created_at) %> ago</small>
-            </div>
           </div>
+          <div class="row">
+            <div class="col-12">
+              <strong><%=link_to User.first.username, games_path %></strong><small class="text-muted"> <%= time_ago_in_words(bench.created_at) %> ago</small>
+            </div>
           </div>
         </div>
       </div>
       <div class="card d-none d-lg-block">
         <div class="row">
           <div class="col-5">
-            <%= link_to image_tag("https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/maxresdefault.jpg", class: "img-fluid card-img-top"), bench %>
+            <%= link_to image_tag("https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/mqdefault.jpg", class: "img-fluid card-img-top"), bench %>
           </div>
           <div class="col-7 d-none d-lg-block">
             <div class="card-block ml-n4 px-1">
@@ -51,7 +47,7 @@
     <% @user_benchmarks.where.not(title: NIL).order(created_at: :desc).limit(5).each do |bench| %>
       <div class="card" style="">
         <% if bench.game.steamid.nil? %>
-            <%= link_to image_tag(bench.game.image_url.to_s, class: 'card-img-top'), bench %>
+            <%= link_to image_tag(bench.game.image_url, class: 'card-img-top'), game_path(bench.game) %>
         <% else %>
           <%= link_to image_tag("https://steamcdn-a.akamaihd.net/steam/apps/" + bench.game.steamid.to_s + "/header.jpg", class: 'card-img-top'), bench %>
         <% end %>
