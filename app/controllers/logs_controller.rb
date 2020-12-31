@@ -32,6 +32,9 @@ class LogsController < ApplicationController
   
   def create
     @log = Log.new(log_params)
+    if request.user_agent == "mangohud" && @log.user_id != 176
+      return
+    end
     @game = @log.game
     respond_to do |format|
       if @log.save(:validate => false)
