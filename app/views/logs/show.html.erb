@@ -18,7 +18,7 @@
   <div class="row">
     <% if @log.user.username != "MangoHud_Uploader" %>
     <div class="col-3 mx-auto" style="padding-right: 5px; padding-top: 0px;">
-        <a href="<%= user_path(@log.user) %>"><img src="<%= @log.user.image %>" align="right" class="rounded" height="100px"></a>
+        <%= link_to image_tag(log.user.profile, class: "rounded", height: "100px", align: "right"), log.user %>
       <br><br><br><br><br>
       <p class="text-right">
         <strong><%=link_to @log.user.username, @log.user %></strong><br>
