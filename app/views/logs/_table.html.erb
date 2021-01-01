@@ -1,7 +1,7 @@
 <% logs.all.order(id: :desc).each do |log| %>
     <div class="row">
       <div class="col-3 mx-auto" style="padding-right: 5px; padding-top: 0px;">
-          <%= link_to image_tag(log.user.profile, class: "rounded", height: "100px", align: "right"), log.user %>
+          <%= link_to image_tag(log.user.profile, class: "rounded", height: "100px", align: "right"), log.user if log.profile.attached? %>
         <br><br><br><br><br>
         <p class="text-right">
           <strong><%=link_to log.user.username, log.user %></strong><br>
