@@ -15,7 +15,7 @@
     <% if benches_game.gpu? && benches_game.cpu? %>
       <div class="row">
         <div class="col-6">
-          <%= column_chart cpu_benches_game_path(benches_game), title: 'GPU Load', id: 'cpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+          <%= column_chart cpu_benches_game_path(benches_game), title: 'CPU Load', id: 'cpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
         </div>
         <div class="col-6">
           <%= column_chart gpu_benches_game_path(benches_game), title: 'GPU Load', id: 'gpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
