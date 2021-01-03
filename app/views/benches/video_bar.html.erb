@@ -26,9 +26,7 @@
   </div>
 </div>
 <% else %>
-<script>
-  $.getScript( "<%= bench_path(@benchmark) %>?game=<%= @benchmark.games.last.id %>&type=full")
-</script>
+
 <% end %>
 <script type="text/javascript">
   $('#spider').hide()
@@ -43,48 +41,12 @@
     }
   }
   
-  $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-    if(this.id == "nav-game-tab-total"){
-      charts = ['fps', 'frametime', 'bar']
-      $.each(charts, function (i, value){
-        if(value == 'bar'){
-          chart = Chartkick.charts[value]
-          chart.updateData('/benchmarks/<%= @benchmark.id %>/' + 'totalbar')
-        }
-      })
-      $('#fps').hide()
-      $('#frametime').hide()
-      $('#spider').show()
-      $('#stats-table').html('<%= j render partial: 'benches/stats_total', locals: {types: BenchesGame.where(bench_id: @benchmark.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id).first.id} %>')
-    }
-    <% @benchmark.games.order(name: :asc).each_with_index do |game, i| %>
-        if(this.id == "nav-game-tab-<%= game.id %>"){
-          $('#gameName').html("<%= raw game.name %>")
-          $('#spider').hide()
-          $('#fps').show()
-          $('#frametime').show()
-          $('#bar').show()
-          $('#stats-table').html('<%= j render partial: 'benches/stats', locals: {types: BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).first.types, benches_game_id: BenchesGame.where(bench_id: @benchmark.id, game_id: game.id).first.id} %>')
-          charts = ['fps', 'frametime', 'bar']
-          $.each(charts, function (i, value){
-            chart = Chartkick.charts[value]
-
-              if(value == 'bar'){
-                chart.updateData('/benches_games/<%= BenchesGame.where(game_id: game.id, bench_id: @benchmark.id).last.id  %>/' + value)
-              } else {
-
-              }
-
-          })
-        }
-      <% end %>
-  })
 </script>
 <h1 class="text-center"><%= @benchmark.name %></h1>
 <% if @benchmark.games.count > 1 %>
 <h3 class="text-center" id="gameTitle"><%= @benchmark.inputs.last.game.name %></h3>
 <% end %>
-<%#= bar_chart bar_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id,
+<%= bar_chart bar_benches_game_path(BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id,
  bench_id: @benchmark.id).last.id), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Max/Avg', id: 'bar', ytitle: "FPS", library: {plotOptions: { column: { colorByPoint: true}},subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px' %> 
 <div id='bar_chart'></div>
 <div id="gameStats">
@@ -100,7 +62,6 @@
     $('#pills-tabContent').hide()
     animateGraph();
   }
-  
   
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));

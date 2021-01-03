@@ -1,140 +1,59 @@
-if @graph_type == "bar"
-    json.data do
-        json.array! ["1%", "AVG", "97th"] do | name |
-            json.x @benches_game.one_array if name == "1%"
-            json.x @benches_game.avg_array if name == "AVG"
-            json.x @benches_game.ninety_array if name == "97th"
-            json.y @benches_game.names
-            json.name name
-            json.orientation 'h'
-            json.marker do
-                ["#e64b3b", "#3398dc", "#3cb44b"]
-                json.color '#e64b3b' if name == "1%"
-                json.color '#3398dc' if name == "AVG"
-                json.color '"#3cb44b"' if name == "97th"
-                json.width 1
+if @graph_type == "fps" || @graph_type == "frametime"
+    json.array! @benches_game.types.order(:name) do |type|
+        if @size == "mini"
+            @inputs = type.inputs.where(id: type.inputs.map {|input| input if input.id % 10 == 0 }).where(benches_game_id: @benches_game.id).order(:pos)
+        else
+            @inputs = type.inputs.where(benches_game_id: @benches_game.id).order(:pos)
+        end
+        json.name type.name
+        json.color @inputs.last.color
+        json.data do
+            json.array! @inputs do |input| 
+                json.set! "0", input.pos
+                if @graph_type == "fps"
+                    json.set! "1", input.fps
+                else
+                    json.set! "1", input.frametime
+                end
             end
-            json.type 'bar'
         end
-    end
-    json.layout do
-        json.hovermode false
-        json.responsive true
-        json.margin do 
-            json.l 150
-        end
-        #json.barmode 'stack'
-        json.autosize  true
-        json.modebar do
-            json.orientation "h"
-            json.bgcolor "222"
-            json.color "white"
-        end
-        json.plot_bgcolor "rgba(1,1,1,0)"
-        json.paper_bgcolor "rgba(1,1,1,0)"
-        json.font do
-            json.font 'lato, sans-serif'
-            if params[:size] == "mini"
-                json.size 10
-            else
-                json.size 18
-            end
-            json.color '#E0E0E3'
-        end
-        json.xaxis do
-            json.tickfont do
-                json.color "#E0E0E3"
-            end
-            json.showgrid true
-            json.zerolinecolor "#707073"
-            json.zeroline true
-            json.gridcolor "#707073"
-        end
-        json.height 400
-        # json.legend do
-        #     json.xanchor "left"
-        #     json.x 0
-        #     json.y 0
-        #     json.yanchor "bottom"
-        #     json.orientation "v"
-        # end
     end
 end
-if @graph_type == "frametime" || @graph_type == "fps"
-    json.data @benches_game.types.order(:name) do |type|
-        json.line do
-            json.color type.inputs.last.color
-        end
-        json.mode "lines"
-        json.name type.name
-        @inputs = []
-        if params[:size] == "full"
-            @inputs = type.inputs.where(benches_game_id: @benches_game.id).order(:pos)
-        else
-            @inputs = type.inputs.where(benches_game_id: @benches_game.id).order(:pos).map {|input| input if input.id.to_i % 50 == 0 }.compact
-        end
-        json.x @inputs.pluck(:pos)
-        if @graph_type == "fps"
-            json.y @inputs.pluck(:fps)
-        else
-            json.y @inputs.pluck(:frametime)
+
+if @graph_type == "bar" || @graph_type == "totalbar"
+    json.array! ["1%", "AVG", "97th"] do | name |
+        json.name name
+        json.data do
+            json.array! @benches_game.types.order(:name) do |type|
+                if @graph_type == "totalbar"
+                    typeInputs = @benchmark.inputs
+                else
+                    typeInputs = type.inputs.where(benches_game_id: @benches_game.id)
+                end
+                json.set! "0", type.name
+                if name == "1%"
+                    json.set! "1", typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).average(:fps).round(1)
+                end
+                if name == "AVG"
+                    json.set! "1", typeInputs.average(:fps).round(1)
+                end
+                if name == "97th"
+                    json.set! "1", Bench.percentile(typeInputs.pluck(:fps).sort, 0.97).round(1)
+                end
+            end
         end
     end
-    json.layout do
-        json.margin do 
-            json.r 50
-            json.t 40
-            json.l 50
+end
+
+if @graph_type == "cpu" || @graph_type == "gpu"
+    array = []
+    json.array! @benches_game.types.order(:name) do |type|
+        if @graph_type == "cpu"
+            array.push([type.name, @benches_game.inputs.where(type: type).average(:cpu).round(1), color: "#FFFFFF"])
         end
-        json.modebar do
-            json.orientation "h"
-            json.bgcolor "222"
-            json.color "white"
+        if @graph_type == "gpu"
+            array.push([type.name, @benches_game.inputs.where(type: type).average(:gpu).round(1), color: "#FFFFFF"])
         end
-        json.title do
-            json.text @graph_type.upcase!
-            json.xanchor "center"
-        end
-        json.hovermode false
-        json.responsive true
-        json.legend do
-            json.xanchor "center"
-            json.x 0.5
-            json.y -0.2
-            json.yanchor "bottom"
-            json.orientation "h"
-        end
-        json.font do
-            json.font 'lato, sans-serif'
-            if params[:size] == "mini"
-                json.size 10
-            else
-                json.size 18
-            end
-            json.color '#E0E0E3'
-        end
-        json.plot_bgcolor "rgba(1,1,1,0)"
-        json.paper_bgcolor "rgba(1,1,1,0)"
-        json.xaxis do
-            json.showgrid false
-            json.autotick true
-            json.ticks ""
-            json.showticklabels false
-        end
-        json.yaxis do
-            if params[:graph_type] == "FPS"
-                json.range [@benches_game.min, @benches_game.max]
-            else
-                json.range [0, 1000 / @benches_game.min]
-            end
-            json.tickfont do
-                json.color "#E0E0E3"
-            end
-            json.showgrid true
-            json.zerolinecolor "#707073"
-            json.zeroline true
-            json.gridcolor "#707073"
-        end
-        json.height 400
     end
+    json.merge! array
 end

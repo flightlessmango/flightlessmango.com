@@ -1,84 +1,22 @@
 <% benches_game = BenchesGame.where(game_id: params[:game], bench_id: @benchmark.id).last %>
 <% if params[:type] == "full" %>
     <% if params[:game] != "total" %>
-            $('#gameTitle').html("<%= benches_game.game.name %>")
-        <% if browser.device.mobile? %>
-            $.getJSON('<%= fps_benches_game_path(benches_game) %>' + '.json', function(data) {
-                Plotly.react('fps_chart', data);
-            })
-            Plotly.setPlotConfig({
-                displayModeBar: false
-            });
-            $.getJSON('<%= frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
-                Plotly.react('frametime_chart', data);
-            })
-            Plotly.setPlotConfig({
-                displayModeBar: false
-            });
-            $.getJSON('<%= bar_benches_game_path(benches_game) %>' + '.json', function(data) {
-                Plotly.react('bar_chart', data);
-            })
-            Plotly.setPlotConfig({
-                displayModeBar: false
-            });
-        <% else %>
-            $.getJSON('<%= full_frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
-                Plotly.react('frametime_chart', data);
-            })
-            $.getJSON('<%= full_fps_benches_game_path(benches_game) %>' + '.json', function(data) {
-                Plotly.react('fps_chart', data);
-            })
-            $.getJSON('<%= bar_benches_game_path(benches_game) %>' + '.json', function(data) {
-                Plotly.react('bar_chart', data);
-            })
-        <% end %>
-        $("#fps_chart").show()
-        $("#frametime_chart").show()
+        $('#gameTitle').html("<%= benches_game.game.name %>")
+        charts = ['bar', 'fps', 'frametime', 'gpu', 'cpu']
+        $.each(charts, function (i, value){
+            chart = Chartkick.charts[value]
+            if (typeof chart !== 'undefined') {
+                chart.updateData('/benches_games/<%= benches_game.id  %>/' + value)
+            }
+        })
+        $("#fps").show(); $("#frametime").show(); $("#gpu").show(); $("#cpu").show();
         $("#gameStats").html("<%= j render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>")
     <% else %>
         //$('#gameContent').html("<%#= j render partial: 'benches/total_graphs', locals: {benchmark: @benchmark} %>")
-        $.getJSON('<%= totalbar_bench_path(@benchmark) %>' + '.json', function(data) {
-            Plotly.react('bar_chart', data);
-        })
+        chart = Chartkick.charts["bar"]
+        chart.updateData('/benchmarks/<%= @benchmark.id %>/' + 'totalbar')
         $("#gameStats").html("<%= j render partial: 'stats_total', locals: {types: @benchmark.types} %>")
         $('#gameTitle').html("Total")
-        $("#fps_chart").hide()
-        $("#frametime_chart").hide()
-
-
-
+        $("#fps").hide(); $("#frametime").hide(); $("#gpu").hide(); $("#cpu").hide();
     <% end %>
-<% end %>
-
-<% if params[:type] == "fps" %>
-$('#mobileGraph').html(
-        "<%= j line_chart fps_benches_game_path(benches_game),
-        points: false, curve: false, download: true, title: "FPS", legend: true,
-        height: '400px', min: benches_game.min, xmax: benches_game.inputs.count / benches_game.types.count,
-        adapter: "chartjs", library: {scales: {xAxis: { gridLines: { color: "#707073"}}},title: { fontColor: "white"}} %>"
-)
-<% end %>
-
-<% if params[:type] == "frametime" %>
-     $('#mobileGraph').html(
-        "<%= j line_chart frametime_benches_game_path(benches_game),
-        points: false, curve: false, download: true, title: "Frametime", legend: true,
-        height: '400px', xmax: benches_game.inputs.count / benches_game.types.count,
-        adapter: "chartjs", library: {scales: {xAxis: { gridLines: { color: "#707073"}}},title: { fontColor: "white"}} %>"
-        )
-<% end %>
-
-<% if params[:type] == "cpu" %>
-        $('#mobileGraph').html(
-        "<%= j line_chart cpu_benches_game_path(benches_game),
-        points: false, curve: false, download: true, title: "CPU Load", legend: true,
-        height: '400px', xmax: benches_game.inputs.count / benches_game.types.count,
-        adapter: "chartjs", library: {scales: {xAxis: { gridLines: { color: "#707073"}}},title: { fontColor: "white"}} %>"
-        )
-<% end %>
-
-<% if browser.device.mobile? %>
-    $.each(Chartkick.charts, function(name, chart) {
-        addCallback(name, chart);
-    })
 <% end %>

@@ -10,8 +10,9 @@
     <%= render 'layouts/google_analytics' %>
     <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_pack_tag 'charts', 'data-turbolinks-track': 'reload' if params[:action] == "show" %>
-    <%= javascript_include_tag 'https://cdn.plot.ly/plotly-basic-1.57.0.min.js', 'data-turbolinks-track': 'reload' if params[:action] == "show" || params[:action] == "video_line" ||
+    <%= javascript_pack_tag 'charts', 'data-turbolinks-track': 'reload' if params[:action] == "show" || params[:action] == "video_line" ||
+                                params[:action] == "video_bar" || params[:action] == "video_total" %>
+    <%#= javascript_include_tag 'https://cdn.plot.ly/plotly-basic-1.57.0.min.js', 'data-turbolinks-track': 'reload' if params[:action] == "show" || params[:action] == "video_line" ||
                                 params[:action] == "video_bar" || params[:action] == "video_total"%>
     <%= favicon_link_tag asset_path('favicon.png'), 'data-turbolinks-track': 'reload' %>
     <%= action_cable_meta_tag %>

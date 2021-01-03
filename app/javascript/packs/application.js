@@ -24,22 +24,6 @@ toastr.options = {
 
 global.toastr = toastr;
 
-Highcharts.wrap(Highcharts.Chart.prototype, 'setReflow', function(proceed, reflow) {
-  var chart = this;
-    proceed.call(this, reflow);
-    if (reflow !== false && typeof ResizeObserver === 'function') {
-        // Unbind window.onresize handler so we don't do double redraws
-        if (this.unbindReflow) {
-          this.unbindReflow();
-        }
-        var ro = new ResizeObserver(function () {
-            chart.reflow();
-        });
-        ro.observe(this.renderTo);
-    }
-});
-
-
 // Uncomment to copy all static images under ../images to the output folder and reference
 // them with the image_pack_tag helper in views (e.g <%= image_pack_tag 'rails.png' %>)
 // or the `imagePath` JavaScript helper below.

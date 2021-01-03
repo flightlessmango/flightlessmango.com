@@ -33,6 +33,7 @@ end
     @benches_game = BenchesGame.find(params[:id])
     @benchmark = @benches_game.bench
     @graph_type = params[:graph_type]
+    @size = params[:size]
     respond_to do |format|
         format.json { render :show, status: :created, location: @benchmark }
       end

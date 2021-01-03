@@ -1,25 +1,31 @@
 <script>Chartkick.charts = new Object()</script>
 <div id=gameContent>
   <h3 class="text-center" id="gameTitle"><%= benches_game.game.name %></h3>
-  <% if @benchmark.id > 44 %>
-    <div id='fps_chart'></div>
+  <%# if @benchmark.id > 44 %>
+    <!-- <div id='fps_chart'></div>
     <div id='frametime_chart'></div>
-    <div id='bar_chart'></div>
-  <% else %>
-    <%= line_chart full_fps_benches_game_path(benches_game),
+    <div id='bar_chart'></div> -->
+  <%# else %>
+    <%= line_chart fps_benches_game_path(benches_game),
       points: false, curve: false, download: true, title: 'FPS', xtitle: "Time", ytitle: "FPS",
       id: 'fps', height: '400px', min: benches_game.min %>
-    <%= line_chart full_frametime_benches_game_path(benches_game),
-        points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
-        id: 'frametime',height: '400px', min: 1000 / benches_game.max %>
-    <% if !benches_game.inputs.where(gpu: nil).any? && benches_game.avgcpu != nil%>
-      <%#= column_chart avgcpu_benches_game_path(benches_game), id: 'cpu', max: 100, colors: Bench::TWENTY, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+    <%= line_chart frametime_benches_game_path(benches_game),
+      points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
+      id: 'frametime',height: '400px', min: 1000 / benches_game.max * 0.75 %>
+    <% if benches_game.gpu? && benches_game.cpu? %>
+      <div class="row">
+        <div class="col-6">
+          <%= column_chart cpu_benches_game_path(benches_game), title: 'GPU Load', id: 'cpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+        </div>
+        <div class="col-6">
+          <%= column_chart gpu_benches_game_path(benches_game), title: 'GPU Load', id: 'gpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+        </div>
+      </div>
     <% end %>
-  <% end %>
+  <%# end %>
 
-  <%#= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
+  <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
     library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
-
 
   <div id="gameStats">
     <%= render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>
@@ -94,122 +100,4 @@
   //   addCallback(name, chart);
   // })
 
-</script>
-
-<script>
-function get_layout_fps(){
-  var elmnt = document.getElementById("main-container");
-  var width = elmnt.clientWidth;
-  console.log(width);
-  var layout = {
-    margin: {
-      r: 50,
-      t: 40,
-      l: 50,
-    },
-    modebar: {
-      orientation: 'h',
-      bgcolor: "222",
-      color: 'white',
-      // x: -0.5,
-    },
-    title: {
-      text:'FPS',
-      xanchor: 'right',
-      // x: 0,
-    },
-    hovermode: false,
-    width: width.toString(),
-    showlegend: true,
-    responsive: true,
-    legend: {
-      xanchor: 'center',
-      x: 0.5,
-      y: -0.2,
-      yanchor: 'bottom',
-      orientation: "h",
-    },
-    font: {
-      family: 'lato, sans-serif',
-      size: 18,
-      color: '#E0E0E3'
-    },
-    plot_bgcolor: "rgba(1,1,1,0)",
-    paper_bgcolor: "rgba(1,1,1,0)",
-    xaxis: {
-      showgrid: false,
-      autotick: true,
-      ticks: '',
-      showticklabels: false,
-    },
-    yaxis: {
-      range: [<%= benches_game.min %>, <%= benches_game.max %>],
-      tickfont: {
-        color: "#E0E0E3",
-      },
-      showgrid: true,
-      zerolinecolor:  '#707073',
-      zeroline: true,
-      gridcolor: '#707073',
-    },
-  }
-  return layout
-}
-
-function resize_plotly(){
-  var elmnt = document.getElementById("main-container");
-  var width = elmnt.clientWidth;
-  console.log(width);
-  var layout = {
-    width: width.toString(),
-  }
-  return layout
-}
-<% saved_inputs = benches_game.inputs %>
-
-function fps_chart(){
-  <% if browser.device.mobile? %>
-    $.getJSON('<%= fps_benches_game_path(benches_game) %>' + '.json', function(data) {
-      Plotly.newPlot('fps_chart', data);
-    })
-    Plotly.setPlotConfig({
-      displayModeBar: false
-    });
-  <% else %>
-    $.getJSON('<%= full_fps_benches_game_path(benches_game) %>' + '.json', function(data) {
-      Plotly.newPlot('fps_chart', data, {displayModeBar: false});
-    })
-  <% end %>
-  
-}
-
-function frametime_chart(){
-  var data = []
-  <% if browser.device.mobile? %>
-    $.getJSON('<%= frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
-      Plotly.newPlot('frametime_chart', data);
-    })
-    Plotly.setPlotConfig({
-      displayModeBar: false
-    });
-  <% else %>
-    $.getJSON('<%= full_frametime_benches_game_path(benches_game) %>' + '.json', function(data) {
-      Plotly.newPlot('frametime_chart', data);
-    })
-  <% end %>
-
-}
-function resize_charts(){
-  Plotly.relayout('fps_chart', resize_plotly())
-  Plotly.relayout('frametime_chart', resize_plotly())
-  Plotly.relayout('bar_chart', resize_plotly())
-}
-$( document ).ready(function() {
-  fps_chart();
-  frametime_chart();
-  $.getJSON('<%= bar_benches_game_path(benches_game) %>' + '.json', function(data) {
-    Plotly.newPlot('bar_chart', data);
-  })
-  window.addEventListener('resize', resize_charts);
-})
 </script>
