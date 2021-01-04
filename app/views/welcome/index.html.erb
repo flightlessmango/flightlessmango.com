@@ -2,9 +2,9 @@
 <div class="row">
   <div class="col-xl-8 col-lg-8 col-md-12">
   <h3>Latest FlightlessMango Benchmarks</h3>
-    <% @benchmarks.order(created_at: :desc).limit(10).each do |bench| %>
+    <% @benchmarks.order(created_at: :desc).each do |bench| %>
       <div class="d-block d-lg-none">
-        <%= link_to image_tag("https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/maxresdefault.jpg", class: "img-fluid card-img-top"), bench %>
+        <%= link_to image_tag("https://img.youtube.com/vi/#{bench.youtubeid.gsub("-part2", "")}/mqdefault.jpg", class: "img-fluid card-img-top"), bench %>
         <div class="card-body" style="background-color: #303030">
         <div class="row">
           <div class="col-11">
