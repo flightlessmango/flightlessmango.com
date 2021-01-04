@@ -15,7 +15,7 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <strong><%=link_to User.first.username, games_path %></strong><small class="text-muted"> <%= time_ago_in_words(bench.created_at) %> ago</small>
+              <strong><%= link_to @mango.username, games_path %></strong><small class="text-muted"> <%= time_ago_in_words(bench.created_at) %> ago</small>
             </div>
           </div>
         </div>
@@ -34,7 +34,7 @@
               <div class="d-none d-lg-block d-xl-none"> </div>
               <div class="row d-flex flex-column align-items-end">
                 <div class="col-12">
-                  <strong><%=link_to User.first.username, games_path %></strong><small class="text-muted float-right"><%= time_ago_in_words(bench.created_at) %> ago</small>
+                  <strong><%= link_to @mango.username, games_path %></strong><small class="text-muted float-right"><%= time_ago_in_words(bench.created_at) %> ago</small>
                 </div>
               </div>
             </div>

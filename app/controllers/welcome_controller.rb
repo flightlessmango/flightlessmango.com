@@ -6,5 +6,6 @@ class WelcomeController < ApplicationController
             @benchmarks = Bench.all.where(published: true)
         end
         @user_benchmarks = Log.all
+        @mango = User.first
     end
 end
