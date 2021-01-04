@@ -1,30 +1,23 @@
 <script>Chartkick.charts = new Object()</script>
 <div id=gameContent>
   <h3 class="text-center" id="gameTitle"><%= benches_game.game.name %></h3>
-  <%# if @benchmark.id > 44 %>
-    <!-- <div id='fps_chart'></div>
-    <div id='frametime_chart'></div>
-    <div id='bar_chart'></div> -->
-  <%# else %>
-    <%= line_chart fps_benches_game_path(benches_game),
-      points: false, curve: false, download: true, title: 'FPS', xtitle: "Time", ytitle: "FPS",
-      id: 'fps', height: '400px', min: benches_game.min %>
-    <%= line_chart frametime_benches_game_path(benches_game),
-      points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
-      id: 'frametime',height: '400px', min: 1000 / benches_game.max * 0.75 %>
-    <% if benches_game.gpu? && benches_game.cpu? %>
-      <div class="row">
-        <div class="col-6">
-          <%= column_chart cpu_benches_game_path(benches_game), title: 'CPU Load', id: 'cpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
-        </div>
-        <div class="col-6">
-          <%= column_chart gpu_benches_game_path(benches_game), title: 'GPU Load', id: 'gpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
-        </div>
+  <%= line_chart JSON(benches_game.fps),
+    points: false, curve: false, download: true, title: 'FPS', xtitle: "Time", ytitle: "FPS",
+    id: 'fps', height: '400px', min: benches_game.min %>
+  <%= line_chart JSON(benches_game.frametime),
+    points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
+    id: 'frametime',height: '400px', min: 1000 / benches_game.max * 0.75 %>
+  <% if benches_game.gpu? && benches_game.cpu? %>
+    <div class="row">
+      <div class="col-6">
+        <%= column_chart JSON(benches_game.cpu), title: 'CPU Load', id: 'cpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
       </div>
-    <% end %>
-  <%# end %>
-
-  <%= bar_chart bar_benches_game_path(benches_game), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
+      <div class="col-6">
+        <%= column_chart JSON(benches_game.gpu), title: 'GPU Load', id: 'gpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+      </div>
+    </div>
+  <% end %>
+  <%= bar_chart JSON(benches_game.bar), colors: ["#e64b3b", "#3398dc", "#3cb44b"], title: 'Min/Avg/Max', ytitle: "FPS", id: 'bar',
     library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
 
   <div id="gameStats">
