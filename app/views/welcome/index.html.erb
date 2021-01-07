@@ -12,7 +12,7 @@
             <div class="col-lg-7 col-sm-12 my-0 mb-n3">
             <div class="card-body px-1 mx-1 pt-0 bt-0">
               <h4 class="card-title"><%= link_to bench.name.truncate(50), bench %></h4>
-                  <div class="mt-n3 mb-3" style="height: 43px; overflow: hidden;"><%= bench.text %><%= bench.text %></div>
+                  <div class="mt-n3 mb-3" style="height: 43px; overflow: hidden;"><%= bench.text %></div>
                       <div class="row align-items-end">
                     <div class="col-12 ">
                       <strong><%= link_to @mango.username, games_path %></strong><small class="text-muted float-right align-text-bottom"><%= time_ago_in_words(bench.created_at) %> ago</small>
