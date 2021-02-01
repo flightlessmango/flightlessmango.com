@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   end
   
   def dashboard
-    @users = User.all
+    @users = User.all.where(online: true)
   end
 
   def refresh_table

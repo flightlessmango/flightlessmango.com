@@ -14,8 +14,8 @@
           <td style="background-color: red;"></td>
         <% end %>
         <td><%= user.id %></td>
-        <td><%= user.username %></td>
-        <td class="col-6"><%= user.url %></td>
+        <td><%= link_to user.username, user_path(user.id) %></td>
+        <td class="col-6"><%= link_to user.url, game_logs_path(user.url) %></td>
       </tr>
     <% end %>
   </tbody>
