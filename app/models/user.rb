@@ -19,7 +19,7 @@ class User < ApplicationRecord
     require 'open-uri'
     begin
       download = open(auth.info.image)
-      User.first.profile.attach(io: download, filename: "profile.png")
+      @user.profile.attach(io: download, filename: "profile.png")
     rescue OpenURI::HTTPError => ex
     end 
     return @user
