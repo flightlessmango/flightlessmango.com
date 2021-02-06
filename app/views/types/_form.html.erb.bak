@@ -1,10 +1,11 @@
-<%= form_for @benches_game, remote: false do |f| %>
+<%= form_for (@type) do |f| %>
   <%= f.hidden_field :bench_id, value: @benchmark.id %>
+  <%= f.hidden_field :benches_game_id, value: @current_benches_game.id %>
   <div class="row">
     <div class="col-sm-12">
       <div class="form-group">
         <div class="controls">
-          <%= f.collection_select :game_id, Game.all.where(source: 'mango').where.not(id: @benchmark.games.pluck(:id)), :id, :name, {}, class: "form-control" %>
+          <%#= f.collection_select :name, Type.select(:name).distinct.order(:name), :name, :name, {} %>
         </div>
       </div>
     </div>
@@ -12,7 +13,7 @@
   <div class="row">
     <div class="col-sm-12">
         <div class="controls">
-          <%= f.submit 'Add game' %>
+          <%= f.submit 'Add Type' %>
         </div>
       </div>
   </div>

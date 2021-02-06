@@ -1,0 +1,20 @@
+<%= form_for (Variation.new), remote: true do |f| %>
+  <%= f.hidden_field :bench_id, value: @benchmark.id %>
+  <%= f.hidden_field :benches_game_id, value: @current_benches_game.id if !@current_benches_game.nil? %>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="form-group">
+        <div class="controls">
+          <%= f.collection_select :name, Variation.select(:name).distinct.order(:name).where.not(name: @benchmark.variations.pluck(:name)), :name, :name, {}, class: 'form-control' %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+        <div class="controls">
+          <%= f.submit 'Add Type' %>
+        </div>
+      </div>
+  </div>
+<% end %>

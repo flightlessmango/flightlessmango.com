@@ -3,6 +3,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.6.4'
 
+gem 'imgkit'
+gem 'wkhtmltoimage-binary'
+gem 'mini_magick'
 gem 'activerecord-import'
 gem 'browser'
 gem 'will_paginate-bootstrap'

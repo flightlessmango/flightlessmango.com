@@ -1,5 +1,5 @@
 class BenchesController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar, :total_cpu, :recording]
+  before_action :authenticate_user!, except: [:index, :show, :fps, :frametime, :full_fps, :full_frametime, :bar, :totalbar, :total_cpu, :recording, :stats]
   def index
     if user_signed_in? && current_user.admin?
       @benchmarks = Bench.all.paginate(page: params[:page], per_page: 15)
@@ -14,7 +14,6 @@ class BenchesController < ApplicationController
   
   def show
     @benchmark = Bench.friendly.find(params[:id])
-    @types = Type.where(name: @benchmark.inputs.joins(:type).pluck(:'types.name').uniq)
     @games = @benchmark.games
     respond_to do |format|
       format.html {}
@@ -32,6 +31,10 @@ class BenchesController < ApplicationController
     @benchmark = Bench.friendly.find(params[:id])
     @benches_game = BenchesGame.new
     @benches_api = ApisBench.new
+    @type = Type.new
+    @benches_games = @benchmark.benches_games
+    @game = Game.new
+    params[:benches_game_id].nil? ? @current_benches_game = @benchmark.benches_games.first : @current_benches_game = BenchesGame.where(id: params[:benches_game_id]).last
   end
   
   def create
@@ -70,7 +73,8 @@ class BenchesController < ApplicationController
           @benchmark.parse_upload_hml(params[:game_id], params[:variation_id], params[:type_id], @benchmark.id, params[:color], params[:api_id])
         end
         if params[:file_type] == "MANGO"
-          @benchmark.parse_upload_mango(params[:game_id], params[:variation_id], params[:type_id], @benchmark.id, params[:color], params[:api_id])
+          puts params[:benches_game_id]
+          @benchmark.parse_upload_mango(params[:benches_game_id].gsub(/[^0-9]/, ''), params[:variation_id], params[:color], request.port)
         end
         if params[:file_type] == "OCAT"
           @benchmark.parse_upload_ocat(params[:game_id], params[:variation_id], params[:type_id], @benchmark.id, params[:color], params[:api_id])
@@ -111,7 +115,9 @@ end
   def delete_inputs
     @benchmark = Bench.friendly.find(params[:id])
     @benchmark.inputs.where(benches_game_id: params[:benches_game_id], type_id: params[:type]).delete_all
-    Type.find(params[:type]).inputs.where(benches_game_id: params[:benches_game_id]).delete_all
+    @variation = Variation.find(params[:type])
+    @variation.inputs.where(benches_game_id: params[:benches_game_id]).delete_all
+    @variation.delete
     respond_to do |format|
       format.js
     end
@@ -119,7 +125,10 @@ end
 
   def refresh
     @benchmark = Bench.friendly.find(params[:id])
-    @benchmark.refresh_json
+    @benchmark.benches_games.each do |game|
+      @benchmark.refresh_json(game, request.port)
+    end
+    
   end
   
   def delete_last_input
@@ -158,6 +167,10 @@ end
     @benchmark = Bench.friendly.find(params[:id])
     @benchmark.update(published: true)
     @benchmark.get_desc
+  end
+
+  def stats
+    @benchmark = Bench.friendly.find(params[:id])
   end
   
   private

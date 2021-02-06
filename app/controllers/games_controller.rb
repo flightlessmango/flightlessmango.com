@@ -8,6 +8,17 @@ class GamesController < ApplicationController
       format.js
     end
   end
+
+  def create
+    @game = Game.new(game_params)
+    if @game.save
+      flash[:success] = "Game successfully created"
+    else
+      flash[:error] = "Game name can't be blank"
+    end
+    redirect_back(fallback_location: root_path)
+  end
+
   
   def user_benchmarks
     @q = Game.ransack(params[:q])
@@ -50,4 +61,9 @@ class GamesController < ApplicationController
     @game = Game.find(params[:id])
     @benchmarks = Log.where(game_id: @game.id)
   end
+
+  def game_params
+    params.require(:game).permit(:name, :source)
+  end
+
 end

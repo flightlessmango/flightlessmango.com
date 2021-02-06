@@ -1,0 +1,19 @@
+<%= form_for @game, remote: false do |f| %>
+  <%= f.hidden_field :source, value: "mango" %>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="form-group">
+        <div class="controls">
+          <%= f.text_field :name, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+        <div class="controls">
+          <%= f.submit 'Create game' %>
+        </div>
+      </div>
+  </div>
+<% end %>

@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks' }
+  resources :types, only: [:new, :create, :index]
   resources :benches, :path => "benchmarks" do
     member do
       get 'recording'
@@ -13,6 +14,7 @@ Rails.application.routes.draw do
       get 'total_cpu'
       get 'publish'
       get 'refresh'
+      get 'stats'
     end
   end
   resources :benches_games do

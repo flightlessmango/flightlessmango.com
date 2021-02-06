@@ -1,6 +1,7 @@
 <%= form_for @benchmark, remote: true do |f| %>
   <%= hidden_field_tag :attachment, value: true %>
   <%= hidden_field_tag :color, value: nil %>
+  <%= hidden_field_tag :benches_game_id, value: @current_benches_game.id if !@current_benches_game.nil? %>
   <%= f.file_field :upload, :class => '' %>
   <%= f.submit "Upload", class: 'btn btn-success' %>
   <select id="file_type" name="file_type">
@@ -8,10 +9,10 @@
       <option value="<%= type %>"><%= type %></option>
     <% end %>
   </select> 
-  <%= select_tag "game_id", options_from_collection_for_select(Game.all.where(id: @benchmark.games.pluck(:id)), "id", "name"), class: 'chosen-select' %>
-  <%= select_tag "type_id", options_from_collection_for_select(Type.all, "id", "name") %>
-  <%= select_tag "variation_id", options_from_collection_for_select(Variation.all, "id", "name") %>
-  <%= select_tag "api_id", options_from_collection_for_select(Api.all.where(id: @benchmark.apis.pluck(:id)), "id", "name") %>
+  <%#= select_tag "game_id", options_from_collection_for_select(Game.all.where(id: @benchmark.games.pluck(:id)), "id", "name"), class: 'chosen-select' %>
+  <%= select_tag "variation_id", options_from_collection_for_select(@current_benches_game.variations, "id", "name", @current_benches_game.variations.last.id) if !@current_benches_game.nil? && @current_benches_game.variations.any? %>
+  <%#= select_tag "variation_id", options_from_collection_for_select(Variation.all, "id", "name") %>
+  <%#= select_tag "api_id", options_from_collection_for_select(Api.all.where(id: @benchmark.apis.pluck(:id)), "id", "name") %>
   <div class="colorPickSelector"></div>
   <script>
   		$(".colorPickSelector").colorPick({

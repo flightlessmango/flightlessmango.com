@@ -1,4 +1,14 @@
-<% if user_signed_in? && current_user.admin?  %>
+<script>window.scrollTo(0,0);</script>
+<%= content_for(:meta_og) do %>
+    <meta property="og:title" content="<%= @benchmark.name %>" />
+    <meta property="og:type" content="Benchmark" />
+    <meta property="og:published_time" content="<%= @benchmark.created_at.strftime('%Y-%m-%d %H:%M') %>" />
+    <meta property="og:author" content="FlightlessMango" />
+    <meta property="og:description" content="<%= truncate(strip_tags(@benchmark.description ), length: 50) %>" />
+    <meta property="og:image" content="<%= polymorphic_url(@benchmark.stats) if @benchmark.stats.attached? %>" />
+    <meta name="twitter:card" content="summary_large_image">
+<% end %>
+<% if user_signed_in? && current_user.admin? %>
    <%= link_to "Edit", edit_bench_path(@benchmark), class: 'btn btn-success' %>
 <% end %>
 <% unless @benchmark.description.blank? %>
@@ -7,15 +17,9 @@
     Benchmark Description
   </button>
 <% end %>
-
 <a class="btn btn-lg btn-primary float-right" href="https://www.youtube.com/watch?v=<%= @benchmark.youtubeid.gsub("-part2", "") %>" role="button" style="background-color: #cc0000;" id="youtubeButton"><strong>Youtube</strong></a>
 <br><br>
 <h2 style="text-align: center;"><%= @benchmark.name %></h2>
-<%
-=begin%>
- <h6 style="text-align: center;">Data without recording</h6> 
-<%
-=end%>
 <br>
 <% unless @benchmark.inputs.empty? %>
   <% if @benchmark.apis.count > 1 %>
@@ -32,22 +36,11 @@
   </nav>
   <div class="tab-content" id="pills-tabContent" style="padding: 25px 0px 0px;">
       <% benches_game = BenchesGame.where(game_id: @benchmark.games.order(name: :asc).first.id, bench_id: @benchmark.id).last %>
-      <%# if browser.device.mobile? %>
-      <%#= render partial: 'graphs_mobile', locals: {benches_game: benches_game} %>
-      <%# else %>
-      <%= render partial: 'graphs', locals: {benches_game: benches_game} %>
-      <%# end %>
-      
-    </div>
+  </div>
     <!-- <div id="loadingSpinner" class="loader" style="margin-top: 50px; margin-bottom: 200px;"></div> -->
     <% else %>
-    <!-- <div id="loadingSpinner" class="loader" style="margin-top: 50px; margin-bottom: 200px;"></div> -->
       <% benches_game = BenchesGame.where(game_id: @benchmark.games.first.id, bench_id: @benchmark.id).last %>
-      <%# if browser.device.mobile? %>
-        <%#= render partial: 'graphs_mobile', locals: {benches_game: benches_game} %>
-      <%# else %>
-        <%= render partial: 'graphs', locals: {benches_game: benches_game} %>
-      <%# end %>
     <% end %>
+    <%= render partial: 'graphs', locals: {benches_game: benches_game} %>
   <% end %>
 <% end %>

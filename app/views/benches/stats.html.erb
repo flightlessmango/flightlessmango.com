@@ -1,0 +1,5 @@
+<% if @benchmark.benches_games.count > 1 %>
+    <%= render partial: 'stats_total', locals: {benches_game: @benchmark} %>
+<% else %>
+    <%= render partial: 'stats', locals: {types: @benchmark.benches_games.first.types, benches_game: @benchmark.benches_games.first} %>
+<% end %>

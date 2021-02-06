@@ -1,6 +1,5 @@
-<% @benchmark.benches_games.each do |game| %>
-<h3><%= Game.find(game.game_id).name %></h3>
-<% if game.inputs.any? %>
+<h3><%= @current_benches_game.game.name %></h3>
+<% if @current_benches_game.inputs.any? %>
   <table class="table table-bordered">
     <thead>
       <th>Color</th>
@@ -12,22 +11,21 @@
       <th>Tools</th>
     </thead>
     <tbody>
-      <% bench_types = @benchmark.types %>
-      <% game.types.each do |type| %>
-          <% inputs = type.inputs.where(benches_game_id: game.id, type_id: type.id) %>
+      <% @current_benches_game.variations.each do |type| %>
+          <% inputs = type.inputs %>
           <tr>
-            <td style="background-color: <%= type.inputs.where(bench_id: @benchmark.id).first.color %>;"></td>
+            <td style="background-color: <%= type.color %>;"></td>
             <td><%= type.name %></td>
-            <td><%= inputs.minimum(:fps).to_i %></td>
-            <td><%= inputs.maximum(:fps).to_i %></td>
-            <td><%= inputs.average(:fps).to_i %></td>
+            <td><%#= inputs.minimum(:fps).to_i %></td>
+            <td><%#= inputs.maximum(:fps).to_i %></td>
+            <td><%#= inputs.average(:fps).to_i %></td>
             <td><%= inputs.count %></td>
-            <td><%= link_to 'Destroy All', delete_inputs_bench_path(@benchmark, :type => type.id, :benches_game_id => game.id), class: 'btn btn-danger', remote: true %>
-            <%= link_to 'Destroy First', delete_first_input_bench_path(@benchmark, :type => type.id, :benches_game_id => game.id), class: 'btn btn-info', remote: true %>
-            <%= link_to 'Destroy Last', delete_last_input_bench_path(@benchmark, :type => type.id, :benches_game_id => game.id), class: 'btn btn-warning', remote: true %></td>
+            <td><%= link_to 'Destroy All', delete_inputs_bench_path(@benchmark, :type => type.id, :benches_game_id => @current_benches_game.id), class: 'btn btn-danger', remote: true %>
+            <%= link_to 'Destroy First', delete_first_input_bench_path(@benchmark, :type => type.id, :benches_game_id => @current_benches_game.id), class: 'btn btn-info', remote: true %>
+            <%= link_to 'Destroy Last', delete_last_input_bench_path(@benchmark, :type => type.id, :benches_game_id => @current_benches_game.id), class: 'btn btn-warning', remote: true %></td>
           </tr>
       <% end %>
     </tbody>
   </table>
   <% end %>
-<% end %>
+

@@ -7,7 +7,7 @@
     <%= csp_meta_tag %>
     <%#= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%#= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= render 'layouts/google_analytics' %>
+    <%= render 'layouts/google_analytics' if Rails.env.production? %>
     <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'charts', 'data-turbolinks-track': 'reload' if params[:action] == "show" || params[:action] == "video_line" ||
@@ -19,10 +19,16 @@
     <%= action_cable_meta_tag %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="turbolinks-cache-control" content="no-cache">
+      <% if content_for?(:meta_og) %>
+      <%= yield :meta_og %>
+  <% else %>
+      <meta property="og:title" content="Boone Community Network" />
+      <meta property="og:type" content="website" />
+  <% end %>
   </head>
 
   <body>
-    <%= render 'layouts/header' unless params[:action] == "recording" || params[:action] == "video_line" || params[:action] == "video_bar" %>
+    <%= render 'layouts/header' unless params[:action] == "recording" || params[:action] == "video_line" || params[:action] == "video_bar" || params[:action] == "stats" %>
     <% if params[:action] == "recording" %>
       <div class="container-fluid">
     <% else %>
@@ -33,7 +39,7 @@
   </body>
 </html>
 
-<% if user_signed_in? %>
-  <% ActionCable.server.broadcast 'user_channel_' + User.first.id.to_s, update: current_user.id %>
-  <% current_user.update(url: request.path) %>
+<% if user_signed_in? && Rails.env.production? %>
+  <%# ActionCable.server.broadcast 'user_channel_' + User.first.id.to_s, update: current_user.id %>
+  <%# current_user.update(url: request.path) %>
 <% end %>

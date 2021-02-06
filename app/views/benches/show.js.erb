@@ -6,17 +6,28 @@
         $.each(charts, function (i, value){
             chart = Chartkick.charts[value]
             if (typeof chart !== 'undefined') {
-                chart.updateData('/benches_games/<%= benches_game.id  %>/' + value)
+                if (value == "fps")
+                    chart.updateData(<%= raw benches_game.fps %>)
+                if (value == "frametime")
+                    chart.updateData(<%= raw benches_game.frametime %>)
+                if (value == "gpu")
+                    chart.updateData(<%= raw benches_game.gpu %>)
+                if (value == "cpu")
+                    chart.updateData(<%= raw benches_game.cpu %>)
+                if (value == "bar")
+                    chart.updateData(<%= raw benches_game.bar %>)
             }
         })
         $("#fps").show(); $("#frametime").show(); $("#gpu").show(); $("#cpu").show();
-        $("#gameStats").html("<%= j render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>")
+        $("#gameStats").html("<%= j render partial: 'stats', locals: {types: benches_game.types, benches_game: benches_game} %>")
     <% else %>
         //$('#gameContent').html("<%#= j render partial: 'benches/total_graphs', locals: {benchmark: @benchmark} %>")
         chart = Chartkick.charts["bar"]
-        chart.updateData('/benchmarks/<%= @benchmark.id %>/' + 'totalbar')
-        $("#gameStats").html("<%= j render partial: 'stats_total', locals: {types: @benchmark.types} %>")
+        chart.updateData(<%= raw @benchmark.totalbar %>)
         $('#gameTitle').html("Total")
         $("#fps").hide(); $("#frametime").hide(); $("#gpu").hide(); $("#cpu").hide();
+        <% json_data = JSON(@benchmark.totalbar) %>
+
+        $("#gameStats").html("<%= j render partial: 'stats_total', locals: {benches_game: @benchmark} %>")
     <% end %>
 <% end %>

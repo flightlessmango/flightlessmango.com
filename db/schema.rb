@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_18_121822) do
+ActiveRecord::Schema.define(version: 2021_01_25_172543) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -74,6 +74,11 @@ ActiveRecord::Schema.define(version: 2020_12_18_121822) do
     t.jsonb "totalcpu"
     t.integer "compare_to"
     t.text "text"
+    t.float "avg"
+    t.float "onemin"
+    t.float "ninetyseventh"
+    t.float "compared"
+    t.integer "variation_id"
     t.index ["slug"], name: "index_benches_on_slug", unique: true
   end
 
@@ -92,6 +97,7 @@ ActiveRecord::Schema.define(version: 2020_12_18_121822) do
     t.integer "min"
     t.integer "max"
     t.jsonb "avgcpu"
+    t.integer "compare_id"
   end
 
   create_table "computers", force: :cascade do |t|
@@ -201,6 +207,13 @@ ActiveRecord::Schema.define(version: 2020_12_18_121822) do
     t.integer "type_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "avg"
+    t.float "onemin"
+    t.float "ninetyseventh"
+    t.float "compared"
+    t.string "color"
+    t.integer "benches_game_id"
+    t.integer "bench_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

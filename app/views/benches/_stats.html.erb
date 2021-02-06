@@ -1,106 +1,38 @@
-<table class="table table-bordered" id="stats-table-game-<%= BenchesGame.find(benches_game_id).game.id %>">
+<table class="table table-bordered" id="stats-table-game-<%= benches_game.id %>" <% if params[:action] == "stats" %> style="width: 600px; height: 315px;" <% end %>>
  <thead class="thead-dark">
     <tr>
         <th>Color</th>
         <th>Name</th>
         <!-- <th class="d-none d-sm-block">Min</th> -->
-        <th class="d-none d-md-block">1% Min</th>
-        <th>Avg</th>
-        <th class="d-none d-md-block">97th percentile</th>
-        <% if @benchmark.compare_to == nil%> 
-          <!-- <th class="d-none d-sm-block">Max</th> -->
-          <% if @types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').any? %>
-            <th>Avg % vs Windows DX12</th>
-          <% end %>
-          <% if @types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').empty? %>
-            <th>Avg % vs Windows DX12</th>
-          <% end %>
-          <% if @types.where(name: 'Windows DX11').any?  && @types.where(name: 'Windows DX12').empty? %>
-            <th>Avg % vs Windows DX11</th>
-          <% end %>
-          <% if @types.where(name: 'stock-CFS').any? %>
-            <th>Avg % vs stock-CFS</th>
-          <% end %>
-          <% if @types.where(name: 'CFS').any? && @types.where(name: 'Windows 10').empty? %>
-            <th>Avg % vs CFS</th>
-          <% end %>
-          <% if @types.where(name: 'v0.50').any? %>
-            <th>Avg % vs v0.50</th>
-          <% end %>
-          <% if @types.where(name: 'Windows DX9').any? %>
-            <th>Avg % vs Windows DX9</th>
-          <% end %>
-          <% if @types.where(name: 'Windows Vulkan').any? %>
-            <th>Avg % vs Windows Vulkan</th>
-          <% end %>
-          <% if @types.where(name: 'vkBasalt: off').any? %>
-            <th>Avg % vs vkBasalt: off</th>
-          <% end %>
-          <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').empty? %>
-            <th>Avg % vs Windows 10</th>
-          <% end %>
-          <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').any? %>
-            <th>Avg % vs CFS</th>
-          <% end %>
-        <% else %>
-          <% compare = Type.find(@benchmark.compare_to) %>
-          <th> Avg % vs <%= compare.name %>
+        <% unless params[:action] == "stats" %>
+          <th class="d-none d-md-block">1% Min</th>
         <% end %>
+        <th>Avg</th>
+        <% unless params[:action] == "stats" %>
+          <th class="d-none d-md-block">97th percentile</th>
+        <% end %>
+        <% if @benchmark == benches_game %>
+          <% compare = Variation.find(benches_game.compare_id) %>
+        <% else %>
+          <% compare = Variation.find(benches_game.compare_id) %>
+        <% end %>
+        <th> Avg % vs <%= compare.name %>
     </tr>
- </thead>
-     <tbody style="color: white;">
-       <% types.order(name: :asc).each do |type| %>
-       <% typeInputs = type.inputs.where(benches_game_id: benches_game_id) %>
-       <% pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1)).pluck(:id) %>
-       <% onepercent = typeInputs.where(id: pluck).average(:fps) %>
-        <tr>
-          <td style="background-color: <%= typeInputs.last.color%>; width: 5%;"></td>
-          <td><%= type %></td>
-          <!-- <td class="d-none d-sm-block"><%#= typeInputs.minimum(:fps).to_i %></td> -->
-          <td class="d-none d-md-block"><%= onepercent.to_i %></td>
-          <td><%= typeInputs.average(:fps).to_i %></td>
-          <td class="d-none d-md-block"><%= Bench.percentile(typeInputs.pluck(:fps).sort, 0.97).round(0) %></td>
-          <!-- <td class="d-none d-sm-block"><%= typeInputs.maximum(:fps).to_i %></td> -->
-          <td>
-          <% if @benchmark.compare_to == nil%> 
-            <% if @types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').any? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows DX12').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'Windows DX12').any? && @types.where(name: 'Windows DX11').empty? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows DX12').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'Windows DX11').any?  && @types.where(name: 'Windows DX12').empty? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows DX11').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'stock-CFS').any? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'stock-CFS').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'CFS').any? && @types.where(name: 'Windows 10').empty? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'CFS').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'v0.50').any? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'v0.50').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'Windows DX9').any? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows DX9').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'Windows Vulkan').any? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows Vulkan').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'vkBasalt: off').any? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'vkBasalt: off').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').empty? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'Windows 10').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-            <% if @types.where(name: 'Windows 10').any? && @types.where(name: 'CFS').any? %>
-              <%= (typeInputs.average(:fps) / @benchmark.types.where(name: 'CFS').last.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-            <% end %>
-          <% else %>
-            <%= (typeInputs.average(:fps) / compare.inputs.where(benches_game_id: benches_game_id).average(:fps) * 100).round(2) %>%
-          <% end %>
-          </td>
-        </tr>
-       <% end %>
-     </tbody>
-    </table>
+  </thead>
+  <tbody style="color: white;">
+    <% benches_game.variations.order(name: :asc).each do |type| %>
+    <tr>
+      <td style="background-color: <%= type.color %>; width: 5%;"></td>
+      <td><%= type %></td>
+      <% unless params[:action] == "stats" %>
+        <td class="d-none d-md-block"><%= type.onemin %></td>
+      <% end %>
+      <td><%= type.avg %></td>
+      <% unless params[:action] == "stats" %>
+        <td class="d-none d-md-block"><%= type.ninetyseventh %></td>
+      <% end %>
+      <td><%= type.compared %>%</td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

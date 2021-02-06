@@ -2,8 +2,9 @@ class BenchesGame < ApplicationRecord
   belongs_to :game
   belongs_to :bench
   has_many :inputs
-  has_many :types, -> { distinct }, through: :inputs
-  
+  has_many :types
+  has_many :variations 
+   
   def stackedChart(game)
     data = [
             {
@@ -20,6 +21,7 @@ class BenchesGame < ApplicationRecord
             }
           ]
     end
+    
     def one_array
       array = []
       self.types.order(name: :desc).each do |type|

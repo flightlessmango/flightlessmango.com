@@ -1,16 +1,17 @@
 class BenchesGamesController < ApplicationController
   before_action :authenticate_user!, except: [:fps, :frametime, :full_fps, :full_frametime, :bar, :gpu, :cpu, :show]
+  
   def destroy
-  @benches_game = BenchesGame.find(params[:id])
-  @benchmark = @benches_game.bench
-  respond_to do |format|
-    format.html { redirect_to edit_bench_path(@benchmark)}
-    format.json { head :no_content }
-    format.js
+    @benches_game = BenchesGame.find(params[:id])
+    @benchmark = @benches_game.bench
+    respond_to do |format|
+      format.html { redirect_to edit_bench_path(@benchmark)}
+      format.json { head :no_content }
+      format.js
+    end
+    @benches_game.inputs.delete_all
+    @benches_game.destroy
   end
-  @benches_game.inputs.delete_all
-  @benches_game.destroy
-end
 
   def create
     @benches_game = BenchesGame.new(benches_game_params)

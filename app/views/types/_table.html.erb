@@ -1,16 +1,16 @@
 <div class="row">
-  <div class="col-sm-6">
+  <div class="col-sm-12">
     <table class="table table-bordered">
       <thead>
-        <th>Type</th>
+        <th>Game</th>
         <th>Action</th>
       </thead>
       <tbody>
-        <% @benchmark.variations.all.each do |variation| %>
+        <% types.each do |type| %>
         <tr>
-          <td><%= variation.name %></td>
+          <td><%= type.name %></td>
           <td>        <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      variation_path(variation),
+                      type_path(type),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
                       :class => 'btn btn-sm btn-danger', remote: false %>

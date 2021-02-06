@@ -7,13 +7,14 @@
   <%= line_chart JSON(benches_game.frametime),
     points: false, curve: false, download: true, title: 'Frame Time', xtitle: "Time", ytitle: "Ms",
     id: 'frametime',height: '400px', min: 1000 / benches_game.max * 0.75 %>
-  <% if benches_game.gpu? && benches_game.cpu? %>
+  <% if benches_game.gpu? && benches_game.cpu? && @benchmark.id > 37%>
     <div class="row">
       <div class="col-6">
-        <%= column_chart JSON(benches_game.cpu), title: 'CPU Load', id: 'cpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+      <% _colors = benches_game.variations.order(:name).pluck(:color) %>
+        <%= column_chart JSON(benches_game.cpu), title: 'CPU Load', id: 'cpu', max: 100, colors: _colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
       </div>
       <div class="col-6">
-        <%= column_chart JSON(benches_game.gpu), title: 'GPU Load', id: 'gpu', max: 100, colors: @benchmark.type_colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
+        <%= column_chart JSON(benches_game.gpu), title: 'GPU Load', id: 'gpu', max: 100, colors: _colors, height: '400px', library: { plotOptions: { column: { colorByPoint: true }}} %>
       </div>
     </div>
   <% end %>
@@ -21,7 +22,7 @@
     library: {subtitle: {useHTML: true, text: '<i class="fas fa-arrow-right" style="color: #00bc8c"></i> More is better'}}, height: '500px', stacked: false %>
 
   <div id="gameStats">
-    <%= render partial: 'stats', locals: {types: benches_game.types, benches_game_id: benches_game.id} %>
+    <%= render partial: 'stats', locals: {types: benches_game.types, benches_game: benches_game} %>
   </div>
 </div>
 

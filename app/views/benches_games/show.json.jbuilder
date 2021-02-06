@@ -1,5 +1,5 @@
 if @graph_type == "fps" || @graph_type == "frametime"
-    json.array! @benches_game.types.order(:name) do |type|
+    json.array! @benches_game.variations.order(:name) do |type|
         if @size == "mini"
             @inputs = type.inputs.where(id: type.inputs.map {|input| input if input.id % 10 == 0 }).where(benches_game_id: @benches_game.id).order(:pos)
         else
@@ -24,9 +24,9 @@ if @graph_type == "bar" || @graph_type == "totalbar"
     json.array! ["1%", "AVG", "97th"] do | name |
         json.name name
         json.data do
-            json.array! @benches_game.types.order(:name) do |type|
+            json.array! @benches_game.variations.order(:name) do |type|
                 if @graph_type == "totalbar"
-                    typeInputs = @benchmark.inputs
+                    typeInputs = @benchmark.inputs.where(variation_id: type.id)
                 else
                     typeInputs = type.inputs.where(benches_game_id: @benches_game.id)
                 end
@@ -47,12 +47,12 @@ end
 
 if @graph_type == "cpu" || @graph_type == "gpu"
     array = []
-    json.array! @benches_game.types.order(:name) do |type|
+    json.array! @benches_game.variations.order(:name) do |type|
         if @graph_type == "cpu"
-            array.push([type.name, @benches_game.inputs.where(type: type).average(:cpu).round(1), color: "#FFFFFF"])
+            array.push([type.name, type.inputs.average(:cpu).round(1)])
         end
         if @graph_type == "gpu"
-            array.push([type.name, @benches_game.inputs.where(type: type).average(:gpu).round(1), color: "#FFFFFF"])
+            array.push([type.name, type.inputs.average(:gpu).round(1)])
         end
     end
     json.merge! array

@@ -1,10 +1,18 @@
 <h3>Edit Benchmark</h3>
 <%= render 'form' %>
-<%= render 'upload' %><br>
-
+<% if @benchmark.benches_games.any? %>
+  <%= render 'upload' %><br>
+<% end %>
+<% @benches_games.each do |game| %>
+  <% btn_classes = "btn btn-primary" %>
+  <% btn_classes += " disabled" if @current_benches_game == game %>
+  <%= link_to game.game.name, edit_bench_path(@benchmark, benches_game_id: game.id), class: btn_classes %>
+<% end %>
+<!-- 
 <div class="progress" style="height: 20px;">
   <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 </div>
+-->
 <p></p>
 <div class="row">
   <div class="col-6">
@@ -12,33 +20,60 @@
       <div class="card-header">Games</div>
         <div class="card-body">
           <%= render 'games_table' %>
-          <%= render 'benches_games/form' %>
+          <div class="row">
+            <div class="col-6">
+              <%= render 'games/form' %>
+            </div>
+            <div class="col-6">
+              <%= render 'benches_games/form' %>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="col-6">
-      <div class="card mb-3">
-        <div class="card-header">Versions</div>
+    <div class="card mb-3">
+      <div class="card-header">Types</div>
         <div class="card-body">
-          <%= render 'variations/table' %>
+          <%= render partial: 'variations/table', locals: {types: @benchmark.variations } %>
+          <div class="row">
+            <div class="col-6">
+              <%= render 'variations/form_create' %>
+            </div>
+            <div class="col-6">
+              <%= render 'variations/form' %>
+            </div>
+          </div>
+          
         </div>
       </div>
     </div>
   </div>
+    
+    <!--
+    <div class="col-6">
+      <div class="card mb-3">
+        <div class="card-header">Versions</div>
+        <div class="card-body">
+          <%#= render 'variations/table' %>
+        </div>
+      </div>
+    </div>
   <div class="row">
     <div class="col-6">
       <div class="card mb-3">
         <div class="card-header">APIs</div>
           <div class="card-body">
-            <%= render 'apis_table' %>
-            <%= render 'apis_benches/form' %>
+            <%#= render 'apis_table' %>
+            <%#= render 'apis_benches/form' %>
           </div>
         </div>
       </div>
   </div>
+  -->
 <%= link_to 'Refresh Json', refresh_bench_path(@benchmark), remote: true, class: 'btn btn-success' %>
 <div id="input_table">
-  <%= render 'input_table' %>
+  <%= render 'input_table' if !@current_benches_game.nil? %>
 </div>
 
 <%= render 'layouts/toastr' %>

@@ -6,10 +6,11 @@ class Bench < ApplicationRecord
   has_and_belongs_to_many :games, through: :inputs
   has_and_belongs_to_many :apis, through: :inputs
   has_many :inputs
-  has_many :types, -> { distinct }, through: :inputs
-  has_many :variations, -> { distinct }, through: :inputs
   has_many :benches_games
+  has_many :types
+  has_many :variations
   has_one_attached :upload
+  has_one_attached :stats
   
   COLORS    =  ["#3398dc", "#6639b6", "#e64b3b", "#72c02c", "#ebc71d", "#ed4a82", "#b09980", "#22e3be", "#fe541e", "#00BB27", "#4000FF"]
   COLORSRGB =  ["rgba(51,152,220,1)", "rgba(102,57,182,1)", "rgba(230,75,59,1)", "rgba(114,192,44,1)", "rgba(235,199,29,1)"]
@@ -39,15 +40,16 @@ class Bench < ApplicationRecord
     require 'csv'
     parsed = CSV.parse(upload.attachment.download)
     length = parsed.count
+    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
+    api_bench = ApisBench.where(bench_id: self.id, api_id: api_id).last.id
     inputs = [
       parsed.each_with_index do |parse, i|
-        Input.new(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: BenchesGame.where(bench_id: self.id, game_id: game_id).last.id,
+        Input.new(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: benches_game.id,
                       type_id: type_id, fps: parse[1], frametime: (1000 / parse[1].to_f).round(2),
-                      cpu: parse[2].to_f, gpu: parse[2].to_i, color: color, pos: parse[3], apis_bench_id: ApisBench.where(bench_id: self.id, api_id: api_id).last.id, api_id: api_id)
+                      cpu: parse[2].to_f, gpu: parse[2].to_i, color: color, pos: parse[3], apis_bench_id: api_bench, api_id: api_id)
         ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 100 == 0
       end
     ]
-    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
     self.refresh_json(benches_game)
     # self.refresh_json_api
     ActionCable.server.broadcast 'web_notifications_channel', 100
@@ -95,35 +97,26 @@ class Bench < ApplicationRecord
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
   
-  def parse_upload_mango(game_id, variation_id, type_id, bench_id, color, api_id)
+  def parse_upload_mango(benches_game_id, variation_id, color, port)
     require 'csv'
+    puts benches_game_id
+    Variation.find(variation_id).update_attribute(:color, color)
+    @benches_game = BenchesGame.find(benches_game_id)
+    self.update_attribute(:compare_to, self.benches_games.first.id) if self.compare_to.nil?
     parsed = CSV.parse(upload.attachment.download)
     count = 0
     length = parsed.count
-    threads = []
     inputs = []
-    api_bench = ApisBench.where(bench_id: self.id, api_id: api_id).last
-    benches_game = BenchesGame.where(game_id: game_id, bench_id: self.id).last
-      parsed.each_with_index do |parse, i|
-          # threads << Thread.new {
-          input = Input.new(variation_id: variation_id, game_id: game_id, bench_id: self.id, benches_game_id: benches_game.id,
-                        type_id: type_id, fps: parse[0], frametime: parse[1].to_f / 1000, cpu: parse[2], gpu: parse[3],
-                        color: color, pos: parse[10], apis_bench_id: api_bench.id, api_id: api_id)
-          inputs.push(input)
-          if inputs.count > 1000
-            Input.import inputs
-            inputs = []
-          end
-          # }
-          # if threads.count > 3
-            # threads.each {|thr| thr.join}
-            # threads = []
-          # end
-          ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
-      end
+    parsed.each_with_index do |parse, i|
+        input = Input.new(variation_id: variation_id, bench_id: self.id, benches_game_id: benches_game_id,
+                      fps: parse[0], frametime: parse[1].to_f / 1000, cpu: parse[2], gpu: parse[3], color: color, pos: parse[10])
+        inputs.push(input)
+        puts inputs.count
+        ActionCable.server.broadcast 'web_notifications_channel', (((i + 0.0) / length) * 100).to_i if i % 50 == 0
+    end
     Input.import inputs
-    self.refresh_json(benches_game)
-    # self.refresh_json_api
+    puts "imported"
+    refresh_json(@benches_game, port)
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
 
@@ -162,7 +155,7 @@ class Bench < ApplicationRecord
     ActionCable.server.broadcast 'web_notifications_channel', 100
   end
   
-  def refresh_json(benches_game)
+  def refresh_json(benches_game, port)
     Input.where(fps: 0).delete_all
     self.inputs.where(fps: nil).delete_all
     full_frametime_chart = {}
@@ -183,8 +176,11 @@ class Bench < ApplicationRecord
     else
       http_protocol = "https"
     end
+    url = url_for(action: 'stats', controller: 'benches', only_path: false, protocol: http_protocol, id: self.slug)
+    kit = IMGKit.new(url.to_s).to_file(self.slug + ".png")
+    `convert #{self.slug + ".png"} -crop 600x315+47 +repage #{self.slug + ".png"}`
     ["fps", "frametime"].each do |graph_type|
-      url = url_for(action: 'show', controller: 'benches_games', only_path: false, protocol: http_protocol, id: benches_game.id, :format => :json, :graph_type => graph_type, :size => "full")
+      url = url_for(action: 'show', controller: 'benches_games', only_path: false, protocol: http_protocol, id: benches_game.id, :format => :json, :graph_type => graph_type, :size => "full", port: port)
       response = Net::HTTP.get(URI(url))
       if graph_type == "fps"
         full_fps_chart = response
@@ -195,7 +191,7 @@ class Bench < ApplicationRecord
     end
 
     ["fps", "frametime", "bar", "cpu", "gpu"].each do |graph_type|
-          url = url_for(action: 'show', controller: 'benches_games', only_path: false, protocol: http_protocol, id: benches_game.id, :format => :json, :graph_type => graph_type, :size => "mini")
+          url = url_for(action: 'show', controller: 'benches_games', only_path: false, protocol: http_protocol, id: benches_game.id, :format => :json, :graph_type => graph_type, :size => "mini", port: port)
           response = Net::HTTP.get(URI(url))
           if graph_type == "fps"
             fps_chart = response
@@ -215,10 +211,22 @@ class Bench < ApplicationRecord
     end
 
     # avgcpu_chart = self.inputs.where(bench: self).joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
+    benches_game.variations.each do |type|
+      typeInputs = type.inputs
+      pluck = typeInputs.where(id: type.inputs.order(fps: :asc).limit(type.inputs.count * 0.1).pluck(:id))
+      onepercent = typeInputs.where(id: pluck).average(:fps).round(1)
+      ninetyseven = Bench.percentile(typeInputs.pluck(:fps).sort, 0.97).round(1)
+      avg = typeInputs.average(:fps).round(1)
+      compared = ((avg / Variation.find(benches_game.compare_id).inputs.average(:fps).round(1)) * 100).round(2)
+      type.update(onemin: onepercent, ninetyseventh: ninetyseven, avg: avg, compared: compared)
+    end
     benches_game.update(full_fps: full_fps_chart, full_frametime: full_frametime_chart, frametime: frametime_chart, fps: fps_chart,
                         bar: bar_chart, min: benches_game.inputs.minimum(:fps), cpu: cpu_chart, gpu: gpu_chart,
                         max: benches_game.inputs.maximum(:fps))
+    self.stats.attach(io: File.open(self.slug + ".png"), filename: "stats.png")
+    `rm #{self.slug + ".png"}`
     ActionCable.server.broadcast 'web_notifications_channel', "reload"
+    return
   end
 
   def refresh_json_total
@@ -230,13 +238,28 @@ class Bench < ApplicationRecord
     else
       http_protocol = "https"
     end
+    url = url_for(action: 'stats', controller: 'benches', only_path: false, protocol: http_protocol, id: self.slug)
+    kit = IMGKit.new(url.to_s).to_file(self.slug + ".png")
     url = url_for(action: 'show', controller: 'benches_games', only_path: false, protocol: http_protocol, id: self.benches_games.last.id, :format => :json, :graph_type => "totalbar")
     uri = URI(url)
     response = Net::HTTP.get(uri)
     totalbar_chart = response
     # totalcpu_chart = self.inputs.where(bench: self).joins(:type).group('types.name').order('types.name ASC').average(:cpu).chart_json
+
+    self.variations.pluck(:name).uniq do |type_name|
+      typeInputs = self.inputs.where(variation_id: self.variations.where(name: type_name).pluck(:id))
+      pluck = typeInputs.where(id: typeInputs.order(fps: :asc).limit(typeInputs.count * 0.1).pluck(:id))
+      onepercent = typeInputs.where(id: pluck).average(:fps).round(1)
+      ninetyseven = Bench.percentile(typeInputs.pluck(:fps).sort, 0.97).round(1)
+      avg = typeInputs.average(:fps).round(1)
+      compared_inputs = Input.where(variation_id: Variation.where(name: Variation.find(self.compare_to).name).pluck(:id))
+      compared = ((avg / compared_inputs.average(:fps).round(1)) * 100).round(2)
+      self.update(onemin: onepercent, ninetyseventh: ninetyseven, avg: avg, compared: compared)
+    end
     self.update(totalbar: totalbar_chart)
-    puts url
+    self.stats.attach(io: File.open(self.slug + ".png"), filename: "stats.png")
+    `rm #{self.slug + ".png"}`
+    return
   end
 
   def refresh_json_api
@@ -320,9 +343,9 @@ class Bench < ApplicationRecord
     return array
   end
 
-  def refresh_all
+  def refresh_all(port)
     self.benches_games.each do |game|
-        self.refresh_json(game)
+        self.refresh_json(game, port)
     end
     self.refresh_json_total if self.games.count > 1
   end
