@@ -10,7 +10,7 @@
     "bootstrap": "4.3.1",
     "chart.js": "^2.8.0",
     "chartjs-plugin-streaming": "^1.8.0",
-    "chartkick": "^3.1.1",
+    "chartkick": "^3.2.0",
     "chosen": "^0.0.2",
     "chosen-js": "^1.8.7",
     "highcharts": "^7.1.3",
